@@ -1,3 +1,43 @@
-body {
-  background-color: aqua;
+* {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+}
+
+.container {
+  margin: 20px auto;
+  width: 40%;
+}
+.row {
+  display: flex;
+}
+
+.square {
+  position: relative;
+  height: 0;
+  width: 12.5%;
+  padding-bottom: 12.5%;
+}
+
+.container .row:nth-child(2n-1) .square:nth-child(2n),
+.container .row:nth-child(2n) .square:nth-child(2n-1) {
+  background-color: #e5d2b2;
+}
+
+.container .row:nth-child(2n-1) .square:nth-child(2n-1),
+.container .row:nth-child(2n) .square:nth-child(2n) {
+  background-color: #7f401d;
 }
