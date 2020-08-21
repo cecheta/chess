@@ -11,6 +11,7 @@ import * as boardView from './views/boardView';
 const state = {
   pieces: [],
   squares: [],
+  currentPiece: null,
   player: 1,
 };
 
@@ -86,24 +87,45 @@ function init() {
   squares.forEach((square) => {
     square.addEventListener('drop', handleDrop);
     square.addEventListener('dragover', handleDragOver);
-    square.addEventListener('click', renderPossibleSquares);
+    square.addEventListener('click', handleClick);
   });
 }
 
-function renderPossibleSquares(e) {
-  const id = e.currentTarget.id;
-  const square = getSquare(id);
-  if (!square.piece.movesVisible) {
-    const possibleSquares = square.piece.possibleMoves(id);
-    boardView.renderPossible(possibleSquares);
-  } else {
-    boardView.removePossible();
+function handleClick(e) {
+  const squareElement = e.target.closest('.square');
+  const square = getSquare(squareElement.id);
+
+  if (squareElement.querySelector('.possible')) {
+    const oldSquare = state.currentPiece.getSquare(state);
+    movePiece(oldSquare, square);
+  } else if (square.piece && square.piece.player === state.player) {
+    const id = squareElement.id;
+
+    if (!square.piece.movesVisible) {
+      removePossible();
+      const possibleSquares = square.piece.possibleMoves(id);
+      boardView.renderPossible(possibleSquares);
+      square.piece.movesVisible = true;
+      state.currentPiece = square.piece;
+    } else {
+      removePossible();
+    }
   }
-  square.piece.movesVisible = !square.piece.movesVisible;
 }
 
 function handleDragStart(e) {
-  e.dataTransfer.setData('text', e.target.parentElement.id);
+  const squareElement = e.target.closest('.square');
+  const square = getSquare(squareElement.id);
+
+  if (square.piece.player === state.player) {
+    e.dataTransfer.setData('text', e.target.parentElement.id);
+    removePossible();
+    const id = squareElement.id;
+    const possibleSquares = square.piece.possibleMoves(id);
+    boardView.renderPossible(possibleSquares);
+  } else {
+    e.preventDefault();
+  }
 }
 
 function handleDragOver(e) {
@@ -114,12 +136,28 @@ function handleDragOver(e) {
 }
 
 function handleDrop(e) {
-  const id = e.dataTransfer.getData('text');
-  const squareElement = e.currentTarget;
-  const oldSquare = getSquare(id);
-  const newSquare = getSquare(e.currentTarget.id);
+  const squareElement = e.target.closest('.square');
 
+  if (squareElement.querySelector('.possible')) {
+    const oldSquare = getSquare(e.dataTransfer.getData('text'));
+    const newSquare = getSquare(e.currentTarget.id);
+
+    movePiece(oldSquare, newSquare);
+  }
+}
+
+function removePossible() {
+  boardView.removePossible();
+  state.pieces.forEach((piece) => {
+    piece.movesVisible = false;
+  });
+  state.currentPiece = null;
+}
+
+function movePiece(oldSquare, newSquare) {
   if (oldSquare !== newSquare) {
+    const squareElement = document.querySelector(`#${newSquare.id}`);
+
     if (newSquare.piece) {
       boardView.removePiece(squareElement);
       const pieceIndex = state.pieces.indexOf(newSquare.piece);
@@ -129,14 +167,17 @@ function handleDrop(e) {
     newSquare.piece = oldSquare.piece;
     oldSquare.piece = null;
     newSquare.piece.hasMoved = true;
-    boardView.movePiece(id, squareElement);
+    boardView.movePiece(oldSquare.id, squareElement);
+    state.player = 3 - state.player;
+    removePossible();
   }
 }
 
-function getSquare(square) {
-  return state.squares.find((el) => el.id === square);
+function getSquare(id) {
+  return state.squares.find((el) => el.id === id);
 }
 
 init();
 
+// For testing
 window.state = state;
