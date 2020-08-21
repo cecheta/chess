@@ -9,7 +9,7 @@ export function removePossible() {
   const dots = Array.from(document.querySelectorAll('.possible'));
   dots.forEach((dot) => {
     dot.parentElement.removeChild(dot);
-  })
+  });
 }
 
 export function movePiece(id, square) {

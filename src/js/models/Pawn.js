@@ -9,9 +9,12 @@ export default class Pawn extends Piece {
     const possibleSquares = [];
     const letter = square.charAt(0);
     const digit = parseInt(square.charAt(1));
-    possibleSquares.push(`${letter}${digit + 1}`);
 
-    if (!this.hasMoved) {
+    if (digit <= 7) {
+      possibleSquares.push(`${letter}${digit + 1}`);
+    }
+
+    if (!this.hasMoved && digit <= 6) {
       possibleSquares.push(`${letter}${digit + 2}`);
     }
 
