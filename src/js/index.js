@@ -64,6 +64,32 @@ function init() {
   pieces.forEach((piece) => {
     piece.style.width = `${width}px`;
   });
+
+  pieces.forEach((piece) => {
+    piece.addEventListener('dragstart', handleDragStart);
+  });
+
+  squares.forEach((square) => {
+    square.addEventListener('drop', handleDrop);
+    square.addEventListener('dragover', handleDragOver);
+  });
+}
+
+function handleDragStart(e) {
+  e.dataTransfer.setData('text', e.target.parentElement.id);
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  return false;
+}
+
+function handleDrop(e) {
+  const id = e.dataTransfer.getData('text');
+  const piece = document.querySelector(`#${id}`).firstElementChild;
+  e.target.appendChild(piece);
 }
 
 init();
