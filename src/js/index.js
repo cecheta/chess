@@ -11,57 +11,70 @@ import * as boardView from './views/boardView';
 const state = {
   pieces: [],
   squares: [],
+  player: 1,
 };
 
 function init() {
-  state.pieces.push(new Rook('A8', 1));
-  state.pieces.push(new Knight('B8', 1));
-  state.pieces.push(new Bishop('C8', 1));
-  state.pieces.push(new Queen('D8', 1));
-  state.pieces.push(new King('E8', 1));
-  state.pieces.push(new Bishop('F8', 1));
-  state.pieces.push(new Knight('G8', 1));
-  state.pieces.push(new Rook('H8', 1));
-  state.pieces.push(new Pawn('A7', 1));
-  state.pieces.push(new Pawn('B7', 1));
-  state.pieces.push(new Pawn('C7', 1));
-  state.pieces.push(new Pawn('D7', 1));
-  state.pieces.push(new Pawn('E7', 1));
-  state.pieces.push(new Pawn('F7', 1));
-  state.pieces.push(new Pawn('G7', 1));
-  state.pieces.push(new Pawn('H7', 1));
-
-  state.pieces.push(new Rook('A1', 2));
-  state.pieces.push(new Knight('B1', 2));
-  state.pieces.push(new Bishop('C1', 2));
-  state.pieces.push(new Queen('D1', 2));
-  state.pieces.push(new King('E1', 2));
-  state.pieces.push(new Bishop('F1', 2));
-  state.pieces.push(new Knight('G1', 2));
-  state.pieces.push(new Rook('H1', 2));
-  state.pieces.push(new Pawn('A2', 2));
-  state.pieces.push(new Pawn('B2', 2));
-  state.pieces.push(new Pawn('C2', 2));
-  state.pieces.push(new Pawn('D2', 2));
-  state.pieces.push(new Pawn('E2', 2));
-  state.pieces.push(new Pawn('F2', 2));
-  state.pieces.push(new Pawn('G2', 2));
-  state.pieces.push(new Pawn('H2', 2));
-
-  state.pieces.forEach((piece) => {
-    state.squares.push(new Square(piece.square, piece));
+  const newPieces = [];
+  [1, 2].forEach((player) => {
+    newPieces.push(new Rook(player));
+    newPieces.push(new Knight(player));
+    newPieces.push(new Bishop(player));
+    newPieces.push(new Queen(player));
+    newPieces.push(new King(player));
+    newPieces.push(new Bishop(player));
+    newPieces.push(new Knight(player));
+    newPieces.push(new Rook(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
+    newPieces.push(new Pawn(player));
   });
 
+  const iterator = newPieces[Symbol.iterator]();
+
   for (let i = 65; i <= 72; i++) {
-    for (let j = 3; j <= 6; j++) {
+    const id = String.fromCharCode(i) + '1';
+    const piece = iterator.next().value;
+    state.pieces.push(piece);
+    state.squares.push(new Square(id, piece));
+  }
+
+  for (let i = 65; i <= 72; i++) {
+    const id = String.fromCharCode(i) + '2';
+    const piece = iterator.next().value;
+    state.pieces.push(piece);
+    state.squares.push(new Square(id, piece));
+  }
+
+  for (let j = 3; j <= 6; j++) {
+    for (let i = 65; i <= 72; i++) {
       const id = String.fromCharCode(i) + j;
       state.squares.push(new Square(id, null));
     }
   }
 
+  for (let i = 65; i <= 72; i++) {
+    const id = String.fromCharCode(i) + '8';
+    const piece = iterator.next().value;
+    state.pieces.push(piece);
+    state.squares.push(new Square(id, piece));
+  }
+
+  for (let i = 65; i <= 72; i++) {
+    const id = String.fromCharCode(i) + '7';
+    const piece = iterator.next().value;
+    state.pieces.push(piece);
+    state.squares.push(new Square(id, piece));
+  }
+
   const pieces = Array.from(document.querySelectorAll('.piece'));
   const squares = Array.from(document.querySelectorAll('.square'));
-  const width = document.querySelector('.square').getBoundingClientRect().width
+  const width = document.querySelector('.square').getBoundingClientRect().width;
   pieces.forEach((piece) => {
     piece.style.width = `${width}px`;
   });
@@ -75,14 +88,18 @@ function init() {
     square.addEventListener('dragover', handleDragOver);
     square.addEventListener('click', renderPossibleSquares);
   });
-
 }
 
 function renderPossibleSquares(e) {
   const id = e.currentTarget.id;
   const square = getSquare(id);
-  const possibleSquares = square.piece.possibleMoves(id);
-  boardView.renderPossible(possibleSquares);
+  if (!square.piece.movesVisible) {
+    const possibleSquares = square.piece.possibleMoves(id);
+    boardView.renderPossible(possibleSquares);
+  } else {
+    boardView.removePossible();
+  }
+  square.piece.movesVisible = !square.piece.movesVisible;
 }
 
 function handleDragStart(e) {
@@ -98,8 +115,22 @@ function handleDragOver(e) {
 
 function handleDrop(e) {
   const id = e.dataTransfer.getData('text');
-  const piece = document.querySelector(`#${id}`).firstElementChild;
-  e.currentTarget.appendChild(piece);
+  const squareElement = e.currentTarget;
+  const oldSquare = getSquare(id);
+  const newSquare = getSquare(e.currentTarget.id);
+
+  if (oldSquare !== newSquare) {
+    if (newSquare.piece) {
+      boardView.removePiece(squareElement);
+      const pieceIndex = state.pieces.indexOf(newSquare.piece);
+      state.pieces.splice(pieceIndex, 1);
+    }
+
+    newSquare.piece = oldSquare.piece;
+    oldSquare.piece = null;
+    newSquare.piece.hasMoved = true;
+    boardView.movePiece(id, squareElement);
+  }
 }
 
 function getSquare(square) {
@@ -107,3 +138,5 @@ function getSquare(square) {
 }
 
 init();
+
+window.state = state;
