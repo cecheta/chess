@@ -21,15 +21,29 @@ h1 {
   margin: 20px auto;
   width: 40%;
 }
+
 .row {
   display: flex;
+  justify-content: flex-end;
 }
 
 .square {
   position: relative;
   height: 0;
-  width: 12.5%;
-  padding-bottom: 12.5%;
+  width: 12.25%;
+  padding-bottom: 12.25%;
+}
+
+.edge-horizontal {
+  width: 12.25%;
+  text-align: center;
+}
+
+.edge-vertical {
+  display: flex;
+  width: 2%;
+  justify-content: center;
+  align-items: center;
 }
 
 .container .row:nth-child(2n-1) .square:nth-child(2n),

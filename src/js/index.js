@@ -60,7 +60,7 @@ function init() {
 
   const pieces = Array.from(document.querySelectorAll('.piece'));
   const squares = Array.from(document.querySelectorAll('.square'));
-  const width = document.querySelector('.square').offsetWidth;
+  const width = document.querySelector('.square').getBoundingClientRect().width
   pieces.forEach((piece) => {
     piece.style.width = `${width}px`;
   });
