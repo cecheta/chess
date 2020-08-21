@@ -1,6 +1,11 @@
 export default class Piece {
-  constructor(square, player) {
-    this.square = square;
+  constructor(player) {
     this.player = player;
+    this.hasMoved = false;
+    this.movesVisible = false;
+  }
+
+  getSquare(state) {
+    return state.squares.find((el) => el.piece === this);
   }
 }
