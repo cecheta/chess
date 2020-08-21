@@ -6,6 +6,7 @@ import Bishop from './models/Bishop';
 import Queen from './models/Queen';
 import King from './models/King';
 import Square from './models/Square';
+import * as boardView from './views/boardView';
 
 const state = {
   pieces: [],
@@ -51,8 +52,8 @@ function init() {
     state.squares.push(new Square(piece.square, piece));
   });
 
-  for (let i = 67; i <= 70; i++) {
-    for (let j = 1; j <= 8; j++) {
+  for (let i = 65; i <= 72; i++) {
+    for (let j = 3; j <= 6; j++) {
       const id = String.fromCharCode(i) + j;
       state.squares.push(new Square(id, null));
     }
@@ -72,7 +73,16 @@ function init() {
   squares.forEach((square) => {
     square.addEventListener('drop', handleDrop);
     square.addEventListener('dragover', handleDragOver);
+    square.addEventListener('click', renderPossibleSquares);
   });
+
+}
+
+function renderPossibleSquares(e) {
+  const id = e.currentTarget.id;
+  const square = getSquare(id);
+  const possibleSquares = square.piece.possibleMoves(id);
+  boardView.renderPossible(possibleSquares);
 }
 
 function handleDragStart(e) {
@@ -89,7 +99,11 @@ function handleDragOver(e) {
 function handleDrop(e) {
   const id = e.dataTransfer.getData('text');
   const piece = document.querySelector(`#${id}`).firstElementChild;
-  e.target.appendChild(piece);
+  e.currentTarget.appendChild(piece);
+}
+
+function getSquare(square) {
+  return state.squares.find((el) => el.id === square);
 }
 
 init();
