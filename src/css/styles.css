@@ -55,3 +55,13 @@ h1 {
 .container .row:nth-child(2n) .square:nth-child(2n) {
   background-color: #7f401d;
 }
+
+.possible {
+  background: #8fcbcf7e;
+  border-radius: 50%;
+  position: absolute;
+  width: 30%;
+  height: 30px;
+  top: 35%;
+  right: 35%;
+}
