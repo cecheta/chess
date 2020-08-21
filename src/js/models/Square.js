@@ -3,8 +3,4 @@ export default class Square {
     this.id = id;
     this.piece = piece;
   }
-
-  getPiece() {
-    return this.piece;
-  }
 }
