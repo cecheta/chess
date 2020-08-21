@@ -3,8 +3,6 @@ import Piece from './Piece';
 export default class Pawn extends Piece {
   constructor(square, player) {
     super(square, player);
-
-    this.hasMoved = false;
   }
 
   possibleMoves(square) {
