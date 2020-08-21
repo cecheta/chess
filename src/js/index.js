@@ -103,7 +103,7 @@ function handleClick(e) {
 
     if (!square.piece.movesVisible) {
       removePossible();
-      const possibleSquares = square.piece.possibleMoves(id);
+      const possibleSquares = square.piece.possibleMoves(id, state);
       boardView.renderPossible(possibleSquares);
       square.piece.movesVisible = true;
       state.currentPiece = square.piece;
@@ -121,7 +121,7 @@ function handleDragStart(e) {
     e.dataTransfer.setData('text', e.target.parentElement.id);
     removePossible();
     const id = squareElement.id;
-    const possibleSquares = square.piece.possibleMoves(id);
+    const possibleSquares = square.piece.possibleMoves(id, state);
     boardView.renderPossible(possibleSquares);
   } else {
     e.preventDefault();
