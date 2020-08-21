@@ -21,6 +21,7 @@ module.exports = {
       template: './src/index.html',
     }),
   ],
+  devtool: 'eval-source-map',
   module: {
     rules: [
       {
