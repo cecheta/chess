@@ -11,27 +11,35 @@ export default class Pawn extends Piece {
     const currentLetter = currentSquare.charAt(0);
     const currentDigit = parseInt(currentSquare.charAt(1));
 
-    let attackedSquares;
+    const attackedSquares = [];
     if (this.player === 1) {
-      attackedSquares = [`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 1}`];
+      attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 1}`);
+      attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 1}`);
     } else {
-      attackedSquares = [`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 1}`];
+      attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 1}`);
+      attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 1}`);
     }
     return attackedSquares.filter((id) => !!utils.getSquare(id, allSquares));
   }
 
-  possibleMoves(square, state) {
-    const currentLetter = square.charAt(0);
-    const currentDigit = parseInt(square.charAt(1));
-    const possibleSquares = [];
-    let verticalSquares, diagonalSquares;
+  getPossibleMoves(state) {
+  const currentSquare = this.getSquare(state.squares).id;
+  const currentLetter = currentSquare.charAt(0);
+  const currentDigit = parseInt(currentSquare.charAt(1));
+    const verticalSquares = [],
+      diagonalSquares = [],
+      possibleSquares = [];
 
     if (state.player === 1) {
-      verticalSquares = [`${currentLetter}${currentDigit + 1}`, `${currentLetter}${currentDigit + 2}`];
-      diagonalSquares = [`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 1}`];
+      verticalSquares.push(`${currentLetter}${currentDigit + 1}`);
+      verticalSquares.push(`${currentLetter}${currentDigit + 2}`);
+      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 1}`);
+      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 1}`);
     } else {
-      verticalSquares = [`${currentLetter}${currentDigit - 1}`, `${currentLetter}${currentDigit - 2}`];
-      diagonalSquares = [`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 1}`];
+      verticalSquares.push(`${currentLetter}${currentDigit - 1}`);
+      verticalSquares.push(`${currentLetter}${currentDigit - 2}`);
+      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 1}`);
+      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 1}`);
     }
 
     const firstSquare = state.squares.find((el) => el.id === verticalSquares[0]);

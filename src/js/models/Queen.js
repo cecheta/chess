@@ -11,6 +11,16 @@ export default class Queen extends Piece {
     const currentLetter = currentSquare.charAt(0);
     const currentDigit = parseInt(currentSquare.charAt(1));
 
-    return  [...utils.getAttackingSquaresUp(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresUpRight(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresRight(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresDownRight(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresDown(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresDownLeft(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresLeft(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresUpLeft(currentLetter, currentDigit, allSquares)];
+    const attackedSquares = [];
+    attackedSquares.push(...utils.getAttackingSquaresUp(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresUpRight(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresRight(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresDownRight(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresDown(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresDownLeft(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresLeft(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresUpLeft(currentLetter, currentDigit, allSquares));
+
+    return attackedSquares;
   }
 }

@@ -11,7 +11,15 @@ export default class Knight extends Piece {
     const currentLetter = currentSquare.charAt(0);
     const currentDigit = parseInt(currentSquare.charAt(1));
 
-    const attackedSquares = [`${String.fromCharCode(currentLetter.charCodeAt(0) + 2)}${currentDigit + 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) + 2)}${currentDigit - 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 2}`, `${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 2}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 2}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 2}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 2)}${currentDigit + 1}`, `${String.fromCharCode(currentLetter.charCodeAt(0) - 2)}${currentDigit - 1}`];
+    const attackedSquares = [];
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 2)}${currentDigit + 1}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 2)}${currentDigit - 1}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 2}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 2}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 2}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 2}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 2)}${currentDigit + 1}`);
+    attackedSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 2)}${currentDigit - 1}`);
 
     return attackedSquares.filter((id) => !!utils.getSquare(id, allSquares));
   }

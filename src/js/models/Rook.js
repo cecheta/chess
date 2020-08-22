@@ -11,6 +11,12 @@ export default class Rook extends Piece {
     const currentLetter = currentSquare.charAt(0);
     const currentDigit = parseInt(currentSquare.charAt(1));
 
-    return  [...utils.getAttackingSquaresUp(currentLetter, currentDigit, allSquares), ...utils.getAttackingSquaresDown(currentLetter, currentDigit, allSquares),...utils.getAttackingSquaresLeft(currentLetter, currentDigit, allSquares),...utils.getAttackingSquaresRight(currentLetter, currentDigit, allSquares)];
+    const attackedSquares = [];
+    attackedSquares.push(...utils.getAttackingSquaresUp(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresDown(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresLeft(currentLetter, currentDigit, allSquares));
+    attackedSquares.push(...utils.getAttackingSquaresRight(currentLetter, currentDigit, allSquares));
+
+    return attackedSquares;
   }
 }
