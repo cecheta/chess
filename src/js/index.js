@@ -93,30 +93,26 @@ function init() {
 }
 
 function handleClick(e) {
-  // const squareElement = e.target.closest('.square');
-  // const square = utils.getSquare(squareElement.id, state.squares);
-
-  // if (squareElement.querySelector('.possible')) {
-  //   const oldSquare = state.currentPiece.getSquare(state.squares);
-  //   movePiece(oldSquare, square);
-  // } else if (square.piece && square.piece.player === state.player) {
-  //   const id = squareElement.id;
-
-  //   if (!square.piece.movesVisible) {
-  //     removePossible();
-  //     const possibleSquares = square.piece.possibleMoves(id, state);
-  //     boardView.renderPossible(possibleSquares);
-  //     square.piece.movesVisible = true;
-  //     state.currentPiece = square.piece;
-  //   } else {
-  //     removePossible();
-  //   }
-  // }
-
-  // TEMP
   const squareElement = e.target.closest('.square');
   const square = utils.getSquare(squareElement.id, state.squares);
-  console.log(square.piece.getAttackedSquares(state.squares));
+
+  if (squareElement.querySelector('.possible')) {
+    const oldSquare = state.currentPiece.getSquare(state.squares);
+    movePiece(oldSquare, square);
+  } else if (square.piece && square.piece.player === state.player) {
+    const id = squareElement.id;
+
+    if (!square.piece.movesVisible) {
+      removePossible();
+      let possibleSquares = square.piece.possibleMoves(id, state);
+      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el));
+      boardView.renderPossible(possibleSquares);
+      square.piece.movesVisible = true;
+      state.currentPiece = square.piece;
+    } else {
+      removePossible();
+    }
+  }
 
 }
 
@@ -126,10 +122,11 @@ function handleDragStart(e) {
 
   if (square.piece.player === state.player) {
     e.dataTransfer.setData('text', e.target.parentElement.id);
-    // removePossible();
-    // const id = squareElement.id;
-    // const possibleSquares = square.piece.possibleMoves(id, state);
-    // boardView.renderPossible(possibleSquares);
+    removePossible();
+    const id = squareElement.id;
+    let possibleSquares = square.piece.possibleMoves(id, state);
+    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el));
+    boardView.renderPossible(possibleSquares);
   } else {
     e.preventDefault();
   }
@@ -145,12 +142,12 @@ function handleDragOver(e) {
 function handleDrop(e) {
   const squareElement = e.target.closest('.square');
 
-  // if (squareElement.querySelector('.possible')) {
+  if (squareElement.querySelector('.possible')) {
     const oldSquare = utils.getSquare(e.dataTransfer.getData('text'), state.squares);
     const newSquare = utils.getSquare(e.currentTarget.id, state.squares);
 
     movePiece(oldSquare, newSquare);
-  // }
+  }
 }
 
 function removePossible() {
