@@ -5,7 +5,7 @@ export default class Piece {
     this.movesVisible = false;
   }
 
-  getSquare(state) {
-    return state.squares.find((el) => el.piece === this);
+  getSquare(allSquares) {
+    return allSquares.find((el) => el.piece === this);
   }
 }
