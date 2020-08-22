@@ -91,6 +91,17 @@ export function getAllAttackedSquares(state) {
   return Array.from(new Set(allAttackedSquares));
 }
 
+export function getAllPossibleMoves(state) {
+  const playerPieces = state.pieces.filter((piece) => piece.player === state.player);
+  const allPossibleSquares = [];
+  playerPieces.forEach((piece) => {
+    const potentialMoves = piece.getPossibleMoves(state);
+    const possibleMoves = potentialMoves.filter((el) => checkSquare(state, piece, el));
+    allPossibleSquares.push(...possibleMoves);
+  });
+  return Array.from(new Set(allPossibleSquares));
+}
+
 export function checkSquare(state, piece, newSquareId) {
   const oldSquare = piece.getSquare(state.squares);
   const newSquare = getSquare(newSquareId, state.squares);

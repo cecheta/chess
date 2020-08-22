@@ -1,5 +1,5 @@
 export function renderPossible(squaresArr) {
-  const markup = '<div class="possible"></div>';
+  const markup = '<div class="possible" draggable="false"></div>';
   squaresArr.forEach((square) => {
     document.querySelector(`#${square}`).insertAdjacentHTML('beforeend', markup);
   });

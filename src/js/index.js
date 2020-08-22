@@ -90,6 +90,8 @@ function init() {
     square.addEventListener('dragover', handleDragOver);
     square.addEventListener('click', handleClick);
   });
+
+  document.body.addEventListener('mousedown', preventDrag);
 }
 
 function handleClick(e) {
@@ -100,11 +102,9 @@ function handleClick(e) {
     const oldSquare = state.currentPiece.getSquare(state.squares);
     movePiece(oldSquare, square);
   } else if (square.piece && square.piece.player === state.player) {
-    const id = squareElement.id;
-
     if (!square.piece.movesVisible) {
       removePossible();
-      let possibleSquares = square.piece.possibleMoves(id, state);
+      let possibleSquares = square.piece.getPossibleMoves(state);
       possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el));
       boardView.renderPossible(possibleSquares);
       square.piece.movesVisible = true;
@@ -113,20 +113,21 @@ function handleClick(e) {
       removePossible();
     }
   }
-
 }
 
 function handleDragStart(e) {
+  // If piece has no moves, should not be draggable
   const squareElement = e.target.closest('.square');
   const square = utils.getSquare(squareElement.id, state.squares);
 
   if (square.piece.player === state.player) {
     e.dataTransfer.setData('text', e.target.parentElement.id);
     removePossible();
-    const id = squareElement.id;
-    let possibleSquares = square.piece.possibleMoves(id, state);
+    let possibleSquares = square.piece.getPossibleMoves(state);
     possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el));
     boardView.renderPossible(possibleSquares);
+    square.piece.movesVisible = true;
+    state.currentPiece = square.piece;
   } else {
     e.preventDefault();
   }
@@ -147,6 +148,12 @@ function handleDrop(e) {
     const newSquare = utils.getSquare(e.currentTarget.id, state.squares);
 
     movePiece(oldSquare, newSquare);
+  }
+}
+
+function preventDrag(e) {
+  if (e.preventDefault && e.target.tagName.toLowerCase() !== 'img') {
+    e.preventDefault();
   }
 }
 
@@ -174,6 +181,9 @@ function movePiece(oldSquare, newSquare) {
     boardView.movePiece(oldSquare.id, squareElement);
     state.player = 3 - state.player;
     removePossible();
+    if (utils.getAllPossibleMoves(state).length === 0) {
+      alert('Checkmate!');
+    }
   }
 }
 
