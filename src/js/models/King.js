@@ -4,6 +4,8 @@ import * as utils from '../utils';
 export default class King extends Piece {
   constructor(square, player) {
     super(square, player);
+    this.checked = false;
+    this.castlingSquares = [];
   }
 
   getAttackedSquares(allSquares) {
@@ -25,6 +27,44 @@ export default class King extends Piece {
   }
 
   getPossibleMoves(state, player) {
-    return super.getPossibleMoves(state, player);
+    this.castlingSquares = [];
+    const possibleMoves = super.getPossibleMoves(state, player);
+    if (!this.checked && !this.hasMoved) {
+      const currentSquare = this.getSquare(state.squares).id;
+      const currentLetter = currentSquare.charAt(0);
+      const currentDigit = parseInt(currentSquare.charAt(1));
+
+      const longRook = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 4)}${currentDigit}`, state.squares).piece;
+      const shortRook = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) + 3)}${currentDigit}`, state.squares).piece;
+
+      if (!longRook.hasMoved ) {
+        const square1 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit}`, state.squares);
+        const square2 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 2)}${currentDigit}`, state.squares);
+        const square3 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 3)}${currentDigit}`, state.squares);
+        if (!square1.piece && !square2.piece && !square3.piece) {
+          const checkSquare1 = utils.checkSquare(state, this, square1.id, player);
+          const checkSquare2 = utils.checkSquare(state, this, square2.id, player);
+          const checkSquare3 = utils.checkSquare(state, this, square3.id, player);
+          if (checkSquare1 && checkSquare2 && checkSquare3) {
+            possibleMoves.push(square2.id);
+            this.castlingSquares.push([square2.id, longRook]);
+          }
+        }
+      }
+
+      if (!shortRook.hasMoved) {
+        const square1 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit}`, state.squares);
+        const square2 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) + 2)}${currentDigit}`, state.squares);
+        if (!square1.piece && !square2.piece) {
+          const checkSquare1 = utils.checkSquare(state, this, square1.id, player);
+          const checkSquare2 = utils.checkSquare(state, this, square2.id, player);
+          if (checkSquare1 && checkSquare2) {
+            possibleMoves.push(square2.id);
+            this.castlingSquares.push([square2.id, shortRook]);
+          }
+        }
+      }
+    }
+    return possibleMoves;
   }
 }

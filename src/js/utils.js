@@ -111,7 +111,7 @@ export function checkSquare(state, piece, newSquareId, player) {
   const oldSquare = piece.getSquare(state.squares);
   const newSquare = getSquare(newSquareId, state.squares);
 
-  let removedPiece;
+  let removedPiece = null;
   if (newSquare.piece) {
     const pieceIndex = state.pieces.indexOf(newSquare.piece);
     removedPiece = state.pieces.splice(pieceIndex, 1)[0];

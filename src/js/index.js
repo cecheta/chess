@@ -170,10 +170,9 @@ function removePossible() {
 
 function movePiece(oldSquare, newSquare) {
   if (oldSquare !== newSquare) {
-    const squareElement = document.querySelector(`#${newSquare.id}`);
 
     if (newSquare.piece) {
-      boardView.removePiece(squareElement);
+      boardView.removePiece(newSquare);
       const pieceIndex = state.pieces.indexOf(newSquare.piece);
       state.pieces.splice(pieceIndex, 1);
     }
@@ -181,9 +180,26 @@ function movePiece(oldSquare, newSquare) {
     newSquare.piece = oldSquare.piece;
     oldSquare.piece = null;
     newSquare.piece.hasMoved = true;
-    boardView.movePiece(oldSquare.id, squareElement);
-    const attackedSquares = utils.getAllAttackedSquares(state, state.player);
+    boardView.movePiece(oldSquare.id, newSquare.id);
 
+    if (newSquare.piece.constructor.name === 'King' && newSquare.piece.castlingSquares.find((square) => square[0] === newSquare.id)) {
+      const rook = newSquare.piece.castlingSquares.find((square) => square[0] === newSquare.id)[1];
+      const rookSquareId = rook.getSquare(state.squares).id;
+      let square;
+      if (rookSquareId.charAt(0) === 'A') {
+        square = utils.getSquare('D' + rookSquareId.charAt(1), state.squares);
+      } else if  (rookSquareId.charAt(0) === 'H') {
+        square = utils.getSquare('F' + rookSquareId.charAt(1), state.squares);
+      }
+      const oldSquare = utils.getSquare(rookSquareId, state.squares);
+      square.piece = rook;
+      oldSquare.piece = null;
+      rook.hasMoved = true;
+      boardView.movePiece(rookSquareId, square.id);
+    }
+
+    state.pieces.filter((piece) => piece.constructor.name === 'King').forEach((king) => king.checked = false);
+    const attackedSquares = utils.getAllAttackedSquares(state, state.player);
     for (let square of attackedSquares) {
       const piece = utils.getSquare(square, state.squares).piece;
       if (piece && piece.constructor.name === 'King' && piece.player !== state.player) {
@@ -192,6 +208,8 @@ function movePiece(oldSquare, newSquare) {
           state.playing = false;
         } else {
           console.log('Check!');
+          const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
+          king.checked = true;
         }
         break;
       }
