@@ -12,12 +12,14 @@ export function removePossible() {
   });
 }
 
-export function movePiece(id, square) {
-  const piece = document.querySelector(`#${id}`).firstElementChild;
+export function movePiece(oldSquareId, newSquareId) {
+  const square = document.querySelector(`#${newSquareId}`);
+  const piece = document.querySelector(`#${oldSquareId}`).firstElementChild;
   square.appendChild(piece);
 }
 
-export function removePiece(square) {
+export function removePiece(newSquare) {
+  const square = document.querySelector(`#${newSquare.id}`);
   const piece = square.firstElementChild;
   square.removeChild(piece);
 }
