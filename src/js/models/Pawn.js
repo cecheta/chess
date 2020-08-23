@@ -22,43 +22,36 @@ export default class Pawn extends Piece {
     return attackedSquares.filter((id) => !!utils.getSquare(id, allSquares));
   }
 
-  getPossibleMoves(state) {
-  const currentSquare = this.getSquare(state.squares).id;
-  const currentLetter = currentSquare.charAt(0);
-  const currentDigit = parseInt(currentSquare.charAt(1));
-    const verticalSquares = [],
-      diagonalSquares = [],
-      possibleSquares = [];
+  getPossibleMoves(state, player) {
+    let possibleMoves = super.getPossibleMoves(state, player);
+    possibleMoves = possibleMoves.filter((id) => {
+      const square = state.squares.find((el) => el.id === id);
+      return (square.piece && square.piece.player !== player);
+    });
 
-    if (state.player === 1) {
+    const currentSquare = this.getSquare(state.squares).id;
+    const currentLetter = currentSquare.charAt(0);
+    const currentDigit = parseInt(currentSquare.charAt(1));
+    const verticalSquares = [];
+
+    if (player === 1) {
       verticalSquares.push(`${currentLetter}${currentDigit + 1}`);
       verticalSquares.push(`${currentLetter}${currentDigit + 2}`);
-      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit + 1}`);
-      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit + 1}`);
     } else {
       verticalSquares.push(`${currentLetter}${currentDigit - 1}`);
       verticalSquares.push(`${currentLetter}${currentDigit - 2}`);
-      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit - 1}`);
-      diagonalSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit - 1}`);
     }
 
     const firstSquare = state.squares.find((el) => el.id === verticalSquares[0]);
     if (firstSquare && !firstSquare.piece) {
-      possibleSquares.push(verticalSquares[0]);
+      possibleMoves.push(verticalSquares[0]);
 
       const secondSquare = state.squares.find((el) => el.id === verticalSquares[1]);
       if (secondSquare && !secondSquare.piece && !this.hasMoved) {
-        possibleSquares.push(verticalSquares[1]);
+        possibleMoves.push(verticalSquares[1]);
       }
     }
 
-    diagonalSquares.forEach((square) => {
-      const diagonalSquare = state.squares.find((el) => el.id === square);
-      if (diagonalSquare && diagonalSquare.piece && diagonalSquare.piece.player !== state.player) {
-        possibleSquares.push(square);
-      }
-    });
-
-    return possibleSquares;
+    return possibleMoves;
   }
 }

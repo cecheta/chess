@@ -23,4 +23,8 @@ export default class King extends Piece {
 
     return attackedSquares.filter((id) => !!utils.getSquare(id, allSquares));
   }
+
+  getPossibleMoves(state, player) {
+    return super.getPossibleMoves(state, player);
+  }
 }

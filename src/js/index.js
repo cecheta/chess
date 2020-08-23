@@ -14,6 +14,7 @@ const state = {
   squares: [],
   currentPiece: null,
   player: 1,
+  playing: false,
 };
 
 function init() {
@@ -92,6 +93,8 @@ function init() {
   });
 
   document.body.addEventListener('mousedown', preventDrag);
+
+  state.playing = true;
 }
 
 function handleClick(e) {
@@ -104,8 +107,8 @@ function handleClick(e) {
   } else if (square.piece && square.piece.player === state.player) {
     if (!square.piece.movesVisible) {
       removePossible();
-      let possibleSquares = square.piece.getPossibleMoves(state);
-      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el));
+      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
       boardView.renderPossible(possibleSquares);
       square.piece.movesVisible = true;
       state.currentPiece = square.piece;
@@ -123,8 +126,8 @@ function handleDragStart(e) {
   if (square.piece.player === state.player) {
     e.dataTransfer.setData('text', e.target.parentElement.id);
     removePossible();
-    let possibleSquares = square.piece.getPossibleMoves(state);
-    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el));
+    let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
     boardView.renderPossible(possibleSquares);
     square.piece.movesVisible = true;
     state.currentPiece = square.piece;
@@ -179,11 +182,29 @@ function movePiece(oldSquare, newSquare) {
     oldSquare.piece = null;
     newSquare.piece.hasMoved = true;
     boardView.movePiece(oldSquare.id, squareElement);
-    state.player = 3 - state.player;
-    removePossible();
-    if (utils.getAllPossibleMoves(state).length === 0) {
-      alert('Checkmate!');
+    const attackedSquares = utils.getAllAttackedSquares(state, state.player);
+
+    for (let square of attackedSquares) {
+      const piece = utils.getSquare(square, state.squares).piece;
+      if (piece && piece.constructor.name === 'King' && piece.player !== state.player) {
+        if (utils.getAllPossibleMoves(state, 3 - state.player).length === 0) {
+          alert('Checkmate!');
+          state.playing = false;
+        } else {
+          console.log('Check!');
+        }
+        break;
+      }
     }
+
+    if (state.playing){
+      state.player = 3 - state.player;
+      if (utils.getAllPossibleMoves(state, state.player).length === 0) {
+        alert('Stalemate');
+        state.playing = false;
+      }
+    }
+    removePossible();
   }
 }
 
