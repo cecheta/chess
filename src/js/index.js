@@ -109,9 +109,11 @@ function handleClick(e) {
       removePossible();
       let possibleSquares = square.piece.getPossibleMoves(state, state.player);
       possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-      boardView.renderPossible(possibleSquares);
-      square.piece.movesVisible = true;
-      state.currentPiece = square.piece;
+      if (possibleSquares.length !== 0) {
+        boardView.renderPossible(possibleSquares);
+        square.piece.movesVisible = true;
+        state.currentPiece = square.piece;
+      }
     } else {
       removePossible();
     }
@@ -128,9 +130,13 @@ function handleDragStart(e) {
     removePossible();
     let possibleSquares = square.piece.getPossibleMoves(state, state.player);
     possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-    boardView.renderPossible(possibleSquares);
-    square.piece.movesVisible = true;
-    state.currentPiece = square.piece;
+    if (possibleSquares.length !== 0) {
+      boardView.renderPossible(possibleSquares);
+      square.piece.movesVisible = true;
+      state.currentPiece = square.piece;
+    } else {
+      e.preventDefault();
+    }
   } else {
     e.preventDefault();
   }
@@ -170,7 +176,6 @@ function removePossible() {
 
 function movePiece(oldSquare, newSquare) {
   if (oldSquare !== newSquare) {
-
     if (newSquare.piece) {
       boardView.removePiece(newSquare);
       const pieceIndex = state.pieces.indexOf(newSquare.piece);
@@ -188,7 +193,7 @@ function movePiece(oldSquare, newSquare) {
       let square;
       if (rookSquareId.charAt(0) === 'A') {
         square = utils.getSquare('D' + rookSquareId.charAt(1), state.squares);
-      } else if  (rookSquareId.charAt(0) === 'H') {
+      } else if (rookSquareId.charAt(0) === 'H') {
         square = utils.getSquare('F' + rookSquareId.charAt(1), state.squares);
       }
       const oldSquare = utils.getSquare(rookSquareId, state.squares);
@@ -198,7 +203,7 @@ function movePiece(oldSquare, newSquare) {
       boardView.movePiece(rookSquareId, square.id);
     }
 
-    state.pieces.filter((piece) => piece.constructor.name === 'King').forEach((king) => king.checked = false);
+    state.pieces.filter((piece) => piece.constructor.name === 'King').forEach((king) => (king.checked = false));
     const attackedSquares = utils.getAllAttackedSquares(state, state.player);
     for (let square of attackedSquares) {
       const piece = utils.getSquare(square, state.squares).piece;
@@ -215,7 +220,7 @@ function movePiece(oldSquare, newSquare) {
       }
     }
 
-    if (state.playing){
+    if (state.playing) {
       state.player = 3 - state.player;
       if (utils.getAllPossibleMoves(state, state.player).length === 0) {
         alert('Stalemate');
