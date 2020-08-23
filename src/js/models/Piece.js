@@ -11,11 +11,11 @@ export default class Piece {
     return allSquares.find((el) => el.piece === this);
   }
 
-  getPossibleMoves(state) {
+  getPossibleMoves(state, player) {
     const attackedSquares = this.getAttackedSquares(state.squares);
     const possibleMoves = attackedSquares.filter((el) => {
       const square = utils.getSquare(el, state.squares);
-      return (!square.piece || square.piece.player !== state.player);
+      return (!square.piece || square.piece.player !== player);
     });
     return possibleMoves;
   }

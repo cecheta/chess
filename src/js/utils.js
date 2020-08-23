@@ -82,27 +82,32 @@ export function getAttackingSquaresLeft(currentLetter, currentDigit, allSquares)
   return getAttackingSquaresGeneric(currentLetter, currentDigit, 'minus', 'zero', allSquares);
 }
 
-export function getAllAttackedSquares(state) {
-  const opponentPieces = state.pieces.filter((piece) => piece.player !== state.player);
+export function getAllAttackedSquares(state, player) {
+  const playerPieces = state.pieces.filter((piece) => piece.player === player);
   const allAttackedSquares = [];
-  opponentPieces.forEach((piece) => {
-    allAttackedSquares.push(...piece.getAttackedSquares(state.squares));
+  playerPieces.forEach((piece) => {
+    let attackedSquares = piece.getAttackedSquares(state.squares);
+    attackedSquares = attackedSquares.filter((id) => {
+      const piece = getSquare(id, state.squares).piece;
+      return (!piece || piece.player !== player)
+    });
+    allAttackedSquares.push(...attackedSquares);
   });
   return Array.from(new Set(allAttackedSquares));
 }
 
-export function getAllPossibleMoves(state) {
-  const playerPieces = state.pieces.filter((piece) => piece.player === state.player);
+export function getAllPossibleMoves(state, player) {
+  const playerPieces = state.pieces.filter((piece) => piece.player === player);
   const allPossibleSquares = [];
   playerPieces.forEach((piece) => {
-    const potentialMoves = piece.getPossibleMoves(state);
-    const possibleMoves = potentialMoves.filter((el) => checkSquare(state, piece, el));
+    const potentialMoves = piece.getPossibleMoves(state, player);
+    const possibleMoves = potentialMoves.filter((el) => checkSquare(state, piece, el, player));
     allPossibleSquares.push(...possibleMoves);
   });
   return Array.from(new Set(allPossibleSquares));
 }
 
-export function checkSquare(state, piece, newSquareId) {
+export function checkSquare(state, piece, newSquareId, player) {
   const oldSquare = piece.getSquare(state.squares);
   const newSquare = getSquare(newSquareId, state.squares);
 
@@ -111,16 +116,11 @@ export function checkSquare(state, piece, newSquareId) {
     const pieceIndex = state.pieces.indexOf(newSquare.piece);
     removedPiece = state.pieces.splice(pieceIndex, 1)[0];
   }
-
-  let tempPiece = null;
-  if (newSquare.piece) {
-    tempPiece = newSquare.piece;
-  }
   newSquare.piece = oldSquare.piece;
   oldSquare.piece = null;
 
-  const attackedSquares = getAllAttackedSquares(state);
-  const king = state.pieces.find((piece) => piece.player === state.player && piece.constructor.name === 'King');
+  const attackedSquares = getAllAttackedSquares(state, 3 - player);
+  const king = state.pieces.find((piece) => piece.player === player && piece.constructor.name === 'King');
   const kingId = king.getSquare(state.squares).id;
   let validMove = true;
   if (attackedSquares.find((square) => square === kingId)) {
@@ -131,7 +131,7 @@ export function checkSquare(state, piece, newSquareId) {
     state.pieces.push(removedPiece);
   }
   oldSquare.piece = newSquare.piece;
-  newSquare.piece = tempPiece;
+  newSquare.piece = removedPiece;
 
   return validMove;
 }
