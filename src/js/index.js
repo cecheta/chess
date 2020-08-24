@@ -75,37 +75,55 @@ function init() {
     state.squares.push(new Square(id, piece));
   }
 
-  const pieces = Array.from(document.querySelectorAll('.piece'));
   const squares = Array.from(document.querySelectorAll('.square'));
-  const width = document.querySelector('.square').getBoundingClientRect().width;
-  pieces.forEach((piece) => {
-    piece.style.width = `${width}px`;
-  });
-
-  pieces.forEach((piece) => {
-    piece.addEventListener('dragstart', handleDragStart);
-  });
-
+  boardView.resizePiece();
+  
   squares.forEach((square) => {
+    square.addEventListener('dragstart', handleDragStart);
     square.addEventListener('drop', handleDrop);
     square.addEventListener('dragover', handleDragOver);
     square.addEventListener('click', handleClick);
   });
 
-  document.body.addEventListener('mousedown', preventDrag);
+  document.addEventListener('mousedown', preventDrag);
 
   state.playing = true;
 }
 
 function handleClick(e) {
-  const squareElement = e.target.closest('.square');
-  const square = utils.getSquare(squareElement.id, state.squares);
+  if (state.playing) {
+    const squareElement = e.target.closest('.square');
+    const square = utils.getSquare(squareElement.id, state.squares);
 
-  if (squareElement.querySelector('.possible')) {
-    const oldSquare = state.currentPiece.getSquare(state.squares);
-    movePiece(oldSquare, square);
-  } else if (square.piece && square.piece.player === state.player) {
-    if (!square.piece.movesVisible) {
+    if (squareElement.querySelector('.possible')) {
+      const oldSquare = state.currentPiece.getSquare(state.squares);
+      movePiece(oldSquare, square);
+      checkForCheckmate();
+      removePossible();
+    } else if (square.piece && square.piece.player === state.player) {
+      if (!square.piece.movesVisible) {
+        removePossible();
+        let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+        possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+        if (possibleSquares.length !== 0) {
+          boardView.renderPossible(possibleSquares);
+          square.piece.movesVisible = true;
+          state.currentPiece = square.piece;
+        }
+      } else {
+        removePossible();
+      }
+    }
+  }
+}
+
+function handleDragStart(e) {
+  if (state.playing) {
+    const squareElement = e.target.closest('.square');
+    const square = utils.getSquare(squareElement.id, state.squares);
+
+    if (square.piece.player === state.player) {
+      e.dataTransfer.setData('text', e.target.parentElement.id);
       removePossible();
       let possibleSquares = square.piece.getPossibleMoves(state, state.player);
       possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
@@ -113,32 +131,12 @@ function handleClick(e) {
         boardView.renderPossible(possibleSquares);
         square.piece.movesVisible = true;
         state.currentPiece = square.piece;
+      } else {
+        e.preventDefault();
       }
-    } else {
-      removePossible();
-    }
-  }
-}
-
-function handleDragStart(e) {
-  // If piece has no moves, should not be draggable
-  const squareElement = e.target.closest('.square');
-  const square = utils.getSquare(squareElement.id, state.squares);
-
-  if (square.piece.player === state.player) {
-    e.dataTransfer.setData('text', e.target.parentElement.id);
-    removePossible();
-    let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-    if (possibleSquares.length !== 0) {
-      boardView.renderPossible(possibleSquares);
-      square.piece.movesVisible = true;
-      state.currentPiece = square.piece;
     } else {
       e.preventDefault();
     }
-  } else {
-    e.preventDefault();
   }
 }
 
@@ -157,6 +155,8 @@ function handleDrop(e) {
     const newSquare = utils.getSquare(e.currentTarget.id, state.squares);
 
     movePiece(oldSquare, newSquare);
+    checkForCheckmate();
+    removePossible();
   }
 }
 
@@ -164,14 +164,6 @@ function preventDrag(e) {
   if (e.preventDefault && e.target.tagName.toLowerCase() !== 'img') {
     e.preventDefault();
   }
-}
-
-function removePossible() {
-  boardView.removePossible();
-  state.pieces.forEach((piece) => {
-    piece.movesVisible = false;
-  });
-  state.currentPiece = null;
 }
 
 function movePiece(oldSquare, newSquare) {
@@ -203,32 +195,63 @@ function movePiece(oldSquare, newSquare) {
       boardView.movePiece(rookSquareId, square.id);
     }
 
-    state.pieces.filter((piece) => piece.constructor.name === 'King').forEach((king) => (king.checked = false));
-    const attackedSquares = utils.getAllAttackedSquares(state, state.player);
-    for (let square of attackedSquares) {
-      const piece = utils.getSquare(square, state.squares).piece;
-      if (piece && piece.constructor.name === 'King' && piece.player !== state.player) {
-        if (utils.getAllPossibleMoves(state, 3 - state.player).length === 0) {
-          alert('Checkmate!');
-          state.playing = false;
-        } else {
-          console.log('Check!');
-          const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
-          king.checked = true;
-        }
-        break;
+    if (newSquare.piece.constructor.name === 'Pawn' && (newSquare.id.charAt(1) === '1' || newSquare.id.charAt(1) === '8')) {
+      const pawn = newSquare.piece;
+      let promotionChoice = boardView.renderPromotionChoice(pawn, newSquare.id);
+      let newPiece;
+      if (promotionChoice === 'bishop') {
+        newPiece = new Bishop(state.player);
+      } else if (promotionChoice === 'knight') {
+        newPiece = new Knight(state.player);
+      } else if (promotionChoice === 'rook') {
+        newPiece = new Rook(state.player);
+      } else {
+        promotionChoice = 'queen';
+        newPiece = new Queen(state.player);
       }
+      newSquare.piece = newPiece;
+      const pawnIndex = state.pieces.indexOf(pawn);
+      state.pieces.splice(pawnIndex, 1);
+      state.pieces.push(newPiece);
+      boardView.removePiece(newSquare);
+      boardView.renderPiece(promotionChoice, newSquare);
     }
-
-    if (state.playing) {
-      state.player = 3 - state.player;
-      if (utils.getAllPossibleMoves(state, state.player).length === 0) {
-        alert('Stalemate');
-        state.playing = false;
-      }
-    }
-    removePossible();
   }
+}
+
+function checkForCheckmate() {
+  state.pieces.filter((piece) => piece.constructor.name === 'King').forEach((king) => (king.checked = false));
+  const attackedSquares = utils.getAllAttackedSquares(state, state.player);
+  for (let square of attackedSquares) {
+    const piece = utils.getSquare(square, state.squares).piece;
+    if (piece && piece.constructor.name === 'King' && piece.player !== state.player) {
+      if (utils.getAllPossibleMoves(state, 3 - state.player).length === 0) {
+        alert('Checkmate!');
+        state.playing = false;
+      } else {
+        console.log('Check!');
+        const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
+        king.checked = true;
+      }
+      break;
+    }
+  }
+
+  if (state.playing) {
+    state.player = 3 - state.player;
+    if (utils.getAllPossibleMoves(state, state.player).length === 0) {
+      alert('Stalemate');
+      state.playing = false;
+    }
+  }
+}
+
+function removePossible() {
+  boardView.removePossible();
+  state.pieces.forEach((piece) => {
+    piece.movesVisible = false;
+  });
+  state.currentPiece = null;
 }
 
 init();
