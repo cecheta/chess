@@ -9,6 +9,8 @@ import Square from './models/Square';
 import * as utils from './utils';
 import * as boardView from './views/boardView';
 
+// WINDOW 
+
 const state = {
   pieces: [],
   squares: [],
@@ -77,7 +79,7 @@ function init() {
 
   const squares = Array.from(document.querySelectorAll('.square'));
   boardView.resizePiece();
-  
+
   squares.forEach((square) => {
     square.addEventListener('dragstart', handleDragStart);
     square.addEventListener('drop', handleDrop);
@@ -118,25 +120,23 @@ function handleClick(e) {
 }
 
 function handleDragStart(e) {
-  if (state.playing) {
-    const squareElement = e.target.closest('.square');
-    const square = utils.getSquare(squareElement.id, state.squares);
+  const squareElement = e.target.closest('.square');
+  const square = utils.getSquare(squareElement.id, state.squares);
 
-    if (square.piece.player === state.player) {
-      e.dataTransfer.setData('text', e.target.parentElement.id);
-      removePossible();
-      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-      if (possibleSquares.length !== 0) {
-        boardView.renderPossible(possibleSquares);
-        square.piece.movesVisible = true;
-        state.currentPiece = square.piece;
-      } else {
-        e.preventDefault();
-      }
+  if (square.piece.player === state.player && state.playing) {
+    e.dataTransfer.setData('text', e.target.parentElement.id);
+    removePossible();
+    let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+    if (possibleSquares.length !== 0) {
+      boardView.renderPossible(possibleSquares);
+      square.piece.movesVisible = true;
+      state.currentPiece = square.piece;
     } else {
       e.preventDefault();
     }
+  } else {
+    e.preventDefault();
   }
 }
 
@@ -197,24 +197,9 @@ function movePiece(oldSquare, newSquare) {
 
     if (newSquare.piece.constructor.name === 'Pawn' && (newSquare.id.charAt(1) === '1' || newSquare.id.charAt(1) === '8')) {
       const pawn = newSquare.piece;
-      let promotionChoice = boardView.renderPromotionChoice(pawn, newSquare.id);
-      let newPiece;
-      if (promotionChoice === 'bishop') {
-        newPiece = new Bishop(state.player);
-      } else if (promotionChoice === 'knight') {
-        newPiece = new Knight(state.player);
-      } else if (promotionChoice === 'rook') {
-        newPiece = new Rook(state.player);
-      } else {
-        promotionChoice = 'queen';
-        newPiece = new Queen(state.player);
-      }
-      newSquare.piece = newPiece;
-      const pawnIndex = state.pieces.indexOf(pawn);
-      state.pieces.splice(pawnIndex, 1);
-      state.pieces.push(newPiece);
-      boardView.removePiece(newSquare);
-      boardView.renderPiece(promotionChoice, newSquare);
+      const images = boardView.renderPromotionChoice(pawn, newSquare);
+      images.forEach((image) => image.addEventListener('click', promotePiece));
+      state.playing = false;
     }
   }
 }
@@ -244,6 +229,33 @@ function checkForCheckmate() {
       state.playing = false;
     }
   }
+}
+
+function promotePiece(e) {
+  let newPiece;
+  let promotionChoice = e.target.dataset.piece;
+  if (promotionChoice === 'bishop') {
+    newPiece = new Bishop(state.player);
+  } else if (promotionChoice === 'knight') {
+    newPiece = new Knight(state.player);
+  } else if (promotionChoice === 'rook') {
+    newPiece = new Rook(state.player);
+  } else {
+    promotionChoice = 'queen';
+    newPiece = new Queen(state.player);
+  }
+  const newSquare = state.squares.find((square) => square.piece && square.piece.constructor.name === 'Pawn' && (square.id.charAt(1) === '1' || square.id.charAt(1) === '8'));
+
+  const pawn = newSquare.piece;
+  newSquare.piece = newPiece;
+  const pawnIndex = state.pieces.indexOf(pawn);
+  state.pieces.splice(pawnIndex, 1);
+  state.pieces.push(newPiece);
+  boardView.removePiece(newSquare);
+  boardView.renderPiece(promotionChoice, newSquare);
+  boardView.removePromotionChoice();
+  state.playing = true;
+  checkForCheckmate();
 }
 
 function removePossible() {

@@ -60,19 +60,63 @@ export function removePiece(newSquare) {
   piece.parentElement.removeChild(piece);
 }
 
-export function renderPromotionChoice(pawn, pawnId) {
-  const square = document.querySelector(`#${pawnId}`);
-  return prompt('Choose promotion piece');
+export function renderPromotionChoice(pawn, square) {
+  const squareElement = document.querySelector(`#${square.id}`);
+  const title = document.querySelector('.container');
+  title.insertAdjacentHTML('beforeend', '<div class="promotion">');
+  const selectionBox = document.querySelector('.promotion');
+
+  const images = [new Image(), new Image(), new Image(), new Image()];
+
+  images[0].src = pawn.player === 1 ? queenLight : queenDark;
+  images[1].src = pawn.player === 1 ? bishopLight : bishopDark;
+  images[2].src = pawn.player === 1 ? knightLight : knightDark;
+  images[3].src = pawn.player === 1 ? rookLight : rookDark;
+
+  const iterator = images[Symbol.iterator]();
+
+  iterator.next().value.setAttribute('data-piece', 'queen');
+  iterator.next().value.setAttribute('data-piece', 'bishop');
+  iterator.next().value.setAttribute('data-piece', 'knight');
+  iterator.next().value.setAttribute('data-piece', 'rook');
+
+  images.forEach((image, index) => {
+    image.setAttribute('draggable', 'false');
+    image.setAttribute('data-order', index);
+    selectionBox.appendChild(image);
+    resizePiece(image);
+  });
+
+  const boxWidth = squareElement.getBoundingClientRect().width;
+  const edgeWidth = document.querySelector('.edge-vertical').getBoundingClientRect().width;
+  const squareColumn = squareElement.id.charAt(0);
+  let factor = squareColumn.charCodeAt(0) - 64;
+  if (factor === 8) factor = 6;
+  selectionBox.style.left = `${edgeWidth + boxWidth * factor}px`;
+
+  if (pawn.player === 1) {
+    selectionBox.style.top = `${-squareElement.getBoundingClientRect().height * 8}px`;
+  } else {
+    selectionBox.style.bottom = `${boxWidth * 4 + parseInt(getComputedStyle(selectionBox).getPropertyValue('border-width').replace('px', '')) * 2}px`;
+  }
+  selectionBox.style.width = `${boxWidth}px`;
+
+  return images;
+}
+
+export function removePromotionChoice() {
+  const box = document.querySelector('.promotion');
+  box.parentElement.removeChild(box);
 }
 
 export function resizePiece(piece) {
-  const width = document.querySelector('.square').getBoundingClientRect().width;
+  const boxWidth = document.querySelector('.square').getBoundingClientRect().width;
   if (piece) {
-    piece.style.width = `${width}px`;
+    piece.style.width = `${boxWidth}px`;
   } else {
     const pieces = Array.from(document.querySelectorAll('.piece'));
     pieces.forEach((piece) => {
-      piece.style.width = `${width}px`;
+      piece.style.width = `${boxWidth}px`;
     });
   }
 }

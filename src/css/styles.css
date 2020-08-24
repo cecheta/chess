@@ -17,8 +17,13 @@ h1 {
   text-align: center;
 }
 
+img[draggable="false"] {
+  vertical-align:middle;
+  cursor: pointer;
+}
+
 .container {
-  margin: 20px auto;
+  margin: auto;
   width: 40%;
 }
 
@@ -64,4 +69,14 @@ h1 {
   height: 30%;
   top: 35%;
   right: 35%;
+}
+
+.promotion {
+  background-color: #f8f8f8;
+  border: 3px solid #c8c8c8;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  align-items: center;
 }
