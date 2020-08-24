@@ -2,8 +2,8 @@ import Piece from './Piece';
 import * as utils from '../utils';
 
 export default class Knight extends Piece {
-  constructor(square, player) {
-    super(square, player);
+  constructor(player) {
+    super(player);
   }
 
   getAttackedSquares(allSquares) {

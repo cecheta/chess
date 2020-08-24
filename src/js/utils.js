@@ -89,7 +89,7 @@ export function getAllAttackedSquares(state, player) {
     let attackedSquares = piece.getAttackedSquares(state.squares);
     attackedSquares = attackedSquares.filter((id) => {
       const piece = getSquare(id, state.squares).piece;
-      return (!piece || piece.player !== player)
+      return (!piece || piece.player !== player);
     });
     allAttackedSquares.push(...attackedSquares);
   });

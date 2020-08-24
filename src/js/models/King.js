@@ -37,7 +37,7 @@ export default class King extends Piece {
       const longRook = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 4)}${currentDigit}`, state.squares).piece;
       const shortRook = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) + 3)}${currentDigit}`, state.squares).piece;
 
-      if (!longRook.hasMoved ) {
+      if (longRook && !longRook.hasMoved && longRook.player === player) {
         const square1 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit}`, state.squares);
         const square2 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 2)}${currentDigit}`, state.squares);
         const square3 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) - 3)}${currentDigit}`, state.squares);
@@ -52,7 +52,7 @@ export default class King extends Piece {
         }
       }
 
-      if (!shortRook.hasMoved) {
+      if (shortRook && !shortRook.hasMoved && shortRook.player === player) {
         const square1 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit}`, state.squares);
         const square2 = utils.getSquare(`${String.fromCharCode(currentLetter.charCodeAt(0) + 2)}${currentDigit}`, state.squares);
         if (!square1.piece && !square2.piece) {
