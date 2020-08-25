@@ -4,6 +4,7 @@ import * as utils from '../utils';
 export default class Pawn extends Piece {
   constructor(player) {
     super(player);
+    this.firstMove = false;
   }
 
   getAttackedSquares(allSquares) {
@@ -26,7 +27,7 @@ export default class Pawn extends Piece {
     let possibleMoves = super.getPossibleMoves(state, player);
     possibleMoves = possibleMoves.filter((id) => {
       const square = state.squares.find((el) => el.id === id);
-      return (square.piece && square.piece.player !== player);
+      return square.piece && square.piece.player !== player;
     });
 
     const currentSquare = this.getSquare(state.squares).id;
@@ -42,16 +43,36 @@ export default class Pawn extends Piece {
       verticalSquares.push(`${currentLetter}${currentDigit - 2}`);
     }
 
-    const firstSquare = state.squares.find((el) => el.id === verticalSquares[0]);
+    const firstSquare = utils.getSquare(verticalSquares[0], state.squares);
     if (firstSquare && !firstSquare.piece) {
       possibleMoves.push(verticalSquares[0]);
 
-      const secondSquare = state.squares.find((el) => el.id === verticalSquares[1]);
+      const secondSquare = utils.getSquare(verticalSquares[1], state.squares);
       if (secondSquare && !secondSquare.piece && !this.hasMoved) {
         possibleMoves.push(verticalSquares[1]);
       }
     }
 
+    if ((currentDigit === 5 && player === 1) || (currentDigit === 4 && player === 2)) {
+      let enPassantSquares = [];
+      enPassantSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) + 1)}${currentDigit}`);
+      enPassantSquares.push(`${String.fromCharCode(currentLetter.charCodeAt(0) - 1)}${currentDigit}`);
+      enPassantSquares.forEach((id) => {
+        const square = utils.getSquare(id, state.squares);
+        if (square && square.piece && square.piece.firstMove) {
+          possibleMoves.push(enPassant(player, id));
+        }
+      });
+    }
+
     return possibleMoves;
+  }
+}
+
+function enPassant(player, id) {
+  if (player === 1) {
+    return `${id.charAt(0)}${parseInt(id.charAt(1)) + 1}`;
+  } else if (player === 2) {
+    return `${id.charAt(0)}${parseInt(id.charAt(1)) - 1}`;
   }
 }
