@@ -17,8 +17,8 @@ h1 {
   text-align: center;
 }
 
-img[draggable="false"] {
-  vertical-align:middle;
+img[draggable='false'] {
+  vertical-align: middle;
   cursor: pointer;
 }
 
@@ -79,4 +79,29 @@ img[draggable="false"] {
   position: relative;
   z-index: 1;
   align-items: center;
+}
+
+img[data-order='0'] {
+  animation: fadein 0.3s 0.1s backwards;
+}
+
+img[data-order='1'] {
+  animation: fadein 0.3s 0.2s backwards;
+}
+
+img[data-order='2'] {
+  animation: fadein 0.3s 0.3s backwards;
+}
+
+img[data-order='3'] {
+  animation: fadein 0.3s 0.4s backwards;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
