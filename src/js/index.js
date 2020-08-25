@@ -9,7 +9,7 @@ import Square from './models/Square';
 import * as utils from './utils';
 import * as boardView from './views/boardView';
 
-// WINDOW 
+// WINDOW RESIZE
 
 const state = {
   pieces: [],
@@ -168,6 +168,15 @@ function preventDrag(e) {
 
 function movePiece(oldSquare, newSquare) {
   if (oldSquare !== newSquare) {
+    if (oldSquare.piece.constructor.name === 'Pawn' && !newSquare.piece && oldSquare.id.charAt(0) !== newSquare.id.charAt(0)) {
+      const enPassant = `${newSquare.id.charAt(0)}${oldSquare.id.charAt(1)}`;
+      const enPassantSquare = utils.getSquare(enPassant, state.squares);
+      boardView.removePiece(enPassantSquare);
+      const pieceIndex = state.pieces.indexOf(enPassantSquare.piece);
+      state.pieces.splice(pieceIndex, 1);
+      enPassantSquare.piece = null;
+    }
+
     if (newSquare.piece) {
       boardView.removePiece(newSquare);
       const pieceIndex = state.pieces.indexOf(newSquare.piece);
@@ -176,6 +185,14 @@ function movePiece(oldSquare, newSquare) {
 
     newSquare.piece = oldSquare.piece;
     oldSquare.piece = null;
+    state.squares.forEach((square) => {
+      if (square.piece && square.piece.firstMove) {
+        square.piece.firstMove = false;
+      }
+    });
+    if (newSquare.piece.constructor.name === 'Pawn' && newSquare.piece.hasMoved === false) {
+      newSquare.piece.firstMove = true;
+    }
     newSquare.piece.hasMoved = true;
     boardView.movePiece(oldSquare.id, newSquare.id);
 
