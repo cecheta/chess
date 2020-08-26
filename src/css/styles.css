@@ -17,11 +17,6 @@ h1 {
   text-align: center;
 }
 
-img[draggable='false'] {
-  vertical-align: middle;
-  cursor: pointer;
-}
-
 .container {
   margin: auto;
   width: 40%;
@@ -37,6 +32,16 @@ img[draggable='false'] {
   height: 0;
   width: 12.25%;
   padding-bottom: 12.25%;
+}
+
+.square.check {
+  border: 4px solid rgba(255, 0, 0, 0.7);
+}
+
+.piece.check {
+  position: relative;
+  top: -4px;
+  left: -4px;
 }
 
 .edge-horizontal {
@@ -79,6 +84,11 @@ img[draggable='false'] {
   position: relative;
   z-index: 1;
   align-items: center;
+}
+
+img[draggable='false'] {
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 img[data-order='0'] {
