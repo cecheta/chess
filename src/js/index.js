@@ -168,6 +168,10 @@ function preventDrag(e) {
 
 function movePiece(oldSquare, newSquare) {
   if (oldSquare !== newSquare) {
+    if (state.pieces.find((piece) => piece.checked === true)) {
+      boardView.removeCheck();
+    }
+
     if (oldSquare.piece.constructor.name === 'Pawn' && !newSquare.piece && oldSquare.id.charAt(0) !== newSquare.id.charAt(0)) {
       const enPassant = `${newSquare.id.charAt(0)}${oldSquare.id.charAt(1)}`;
       const enPassantSquare = utils.getSquare(enPassant, state.squares);
@@ -231,8 +235,8 @@ function checkForCheckmate() {
         alert('Checkmate!');
         state.playing = false;
       } else {
-        console.log('Check!');
         const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
+        boardView.renderCheck(king, state.squares);
         king.checked = true;
       }
       break;

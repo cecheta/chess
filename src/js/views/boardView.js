@@ -120,3 +120,22 @@ export function resizePiece(piece) {
     });
   }
 }
+
+export function renderCheck(king, allSquares) {
+  const kingSquare = king.getSquare(allSquares);
+  const kingElement = document.querySelector(`#${kingSquare.id}`);
+  const kingImage = kingElement.querySelector('img');
+
+  const elementHeight = kingElement.getBoundingClientRect().height;
+  kingElement.style.padding = `0 0 ${elementHeight - 2 * 4}px`;
+
+  kingElement.classList.add('check');
+  kingImage.classList.add('check');
+}
+
+export function removeCheck() {
+  debugger;
+  const checkedElements = document.querySelectorAll('.check');
+  Array.from(checkedElements).forEach((el) => el.classList.remove('check'));
+  document.querySelector('div.square[style]').removeAttribute('style');
+}
