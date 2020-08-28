@@ -9,17 +9,17 @@ import Square from './models/Square';
 import * as utils from './utils';
 import * as boardView from './views/boardView';
 
-// WINDOW RESIZE
-
-const state = {
-  pieces: [],
-  squares: [],
-  currentPiece: null,
-  player: 1,
-  playing: false,
-};
+let state;
 
 function init() {
+  state = {
+    pieces: [],
+    squares: [],
+    currentPiece: null,
+    player: 1,
+    playing: false,
+  };
+
   const newPieces = [];
   [1, 2].forEach((player) => {
     newPieces.push(new Rook(player));
@@ -42,44 +42,42 @@ function init() {
 
   const iterator = newPieces[Symbol.iterator]();
 
-  for (let i = 65; i <= 72; i++) {
-    const id = String.fromCharCode(i) + '1';
+  for (let i = 0; i <= 7; i++) {
+    const id = String.fromCharCode(i + 65) + '1';
     const piece = iterator.next().value;
     state.pieces.push(piece);
     state.squares.push(new Square(id, piece));
   }
 
-  for (let i = 65; i <= 72; i++) {
-    const id = String.fromCharCode(i) + '2';
+  for (let i = 0; i <= 7; i++) {
+    const id = String.fromCharCode(i + 65) + '2';
     const piece = iterator.next().value;
     state.pieces.push(piece);
     state.squares.push(new Square(id, piece));
   }
 
   for (let j = 3; j <= 6; j++) {
-    for (let i = 65; i <= 72; i++) {
-      const id = String.fromCharCode(i) + j;
+    for (let i = 0; i <= 7; i++) {
+      const id = String.fromCharCode(i + 65) + j;
       state.squares.push(new Square(id, null));
     }
   }
 
-  for (let i = 65; i <= 72; i++) {
-    const id = String.fromCharCode(i) + '8';
+  for (let i = 0; i <= 7; i++) {
+    const id = String.fromCharCode(i + 65) + '8';
     const piece = iterator.next().value;
     state.pieces.push(piece);
     state.squares.push(new Square(id, piece));
   }
 
-  for (let i = 65; i <= 72; i++) {
-    const id = String.fromCharCode(i) + '7';
+  for (let i = 0; i <= 7; i++) {
+    const id = String.fromCharCode(i + 65) + '7';
     const piece = iterator.next().value;
     state.pieces.push(piece);
     state.squares.push(new Square(id, piece));
   }
 
   const squares = Array.from(document.querySelectorAll('.square'));
-  boardView.resizePiece();
-
   squares.forEach((square) => {
     square.addEventListener('dragstart', handleDragStart);
     square.addEventListener('drop', handleDrop);
@@ -88,6 +86,12 @@ function init() {
   });
 
   document.addEventListener('mousedown', preventDrag);
+
+  if (document.querySelector('.card')) {
+    const card = document.querySelector('.card');
+    card.parentElement.removeChild(card);
+    boardView.resetPieces();
+  }
 
   state.playing = true;
 }
@@ -175,14 +179,14 @@ function movePiece(oldSquare, newSquare) {
     if (oldSquare.piece.constructor.name === 'Pawn' && !newSquare.piece && oldSquare.id.charAt(0) !== newSquare.id.charAt(0)) {
       const enPassant = `${newSquare.id.charAt(0)}${oldSquare.id.charAt(1)}`;
       const enPassantSquare = utils.getSquare(enPassant, state.squares);
-      boardView.removePiece(enPassantSquare);
+      boardView.removePiece(enPassantSquare, true);
       const pieceIndex = state.pieces.indexOf(enPassantSquare.piece);
       state.pieces.splice(pieceIndex, 1);
       enPassantSquare.piece = null;
     }
 
     if (newSquare.piece) {
-      boardView.removePiece(newSquare);
+      boardView.removePiece(newSquare, true);
       const pieceIndex = state.pieces.indexOf(newSquare.piece);
       state.pieces.splice(pieceIndex, 1);
     }
@@ -232,8 +236,9 @@ function checkForCheckmate() {
     const piece = utils.getSquare(square, state.squares).piece;
     if (piece && piece.constructor.name === 'King' && piece.player !== state.player) {
       if (utils.getAllPossibleMoves(state, 3 - state.player).length === 0) {
-        alert('Checkmate!');
+        boardView.renderWinBox(state.player);
         state.playing = false;
+        document.querySelector('.play-again').addEventListener('click', init);
       } else {
         const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
         boardView.renderCheck(king, state.squares);
@@ -246,8 +251,10 @@ function checkForCheckmate() {
   if (state.playing) {
     state.player = 3 - state.player;
     if (utils.getAllPossibleMoves(state, state.player).length === 0) {
-      alert('Stalemate');
+      boardView.renderDrawBox(state.player);
       state.playing = false;
+      document.querySelector('.play-again').addEventListener('click', init);
+
     }
   }
 }
