@@ -1,11 +1,15 @@
-import queenLight from '../../img/pieces/queen_light.svg';
-import bishopLight from '../../img/pieces/bishop_light.svg';
-import knightLight from '../../img/pieces/knight_light.svg';
+import pawnLight from '../../img/pieces/pawn_light.svg';
 import rookLight from '../../img/pieces/rook_light.svg';
-import queenDark from '../../img/pieces/queen_dark.svg';
-import bishopDark from '../../img/pieces/bishop_dark.svg';
-import knightDark from '../../img/pieces/knight_dark.svg';
+import knightLight from '../../img/pieces/knight_light.svg';
+import bishopLight from '../../img/pieces/bishop_light.svg';
+import queenLight from '../../img/pieces/queen_light.svg';
+import kingLight from '../../img/pieces/king_light.svg';
+import pawnDark from '../../img/pieces/pawn_dark.svg';
 import rookDark from '../../img/pieces/rook_dark.svg';
+import knightDark from '../../img/pieces/knight_dark.svg';
+import bishopDark from '../../img/pieces/bishop_dark.svg';
+import queenDark from '../../img/pieces/queen_dark.svg';
+import kingDark from '../../img/pieces/king_dark.svg';
 
 export function renderPossible(squaresArr) {
   const markup = '<div class="possible" draggable="false"></div>';
@@ -17,29 +21,41 @@ export function renderPossible(squaresArr) {
 export function renderPiece(piece, square) {
   const newPiece = new Image();
   if (square.piece.player === 1) {
-    if (piece === 'queen') {
-      newPiece.src = queenLight;
-    } else if (piece === 'bishop') {
-      newPiece.src = bishopLight;
-    } else if (piece === 'knight') {
-      newPiece.src = knightLight;
-    } else if (piece === 'rook') {
-      newPiece.src = rookLight;
+    switch (piece) {
+      case 'queen':
+        newPiece.src = queenLight;
+        break;
+      case 'bishop':
+        newPiece.src = bishopLight;
+        break;
+      case 'knight':
+        newPiece.src = knightLight;
+        break;
+      case 'rook':
+        newPiece.src = rookLight;
+        break;
     }
-  } else {
-    if (piece === 'queen') {
-      newPiece.src = queenDark;
-    } else if (piece === 'bishop') {
-      newPiece.src = bishopDark;
-    } else if (piece === 'knight') {
-      newPiece.src = knightDark;
-    } else if (piece === 'rook') {
-      newPiece.src = rookDark;
+  } else if (square.piece.player === 2) {
+    switch (piece) {
+      case 'queen':
+        newPiece.src = queenDark;
+        break;
+      case 'bishop':
+        newPiece.src = bishopDark;
+        break;
+      case 'knight':
+        newPiece.src = knightDark;
+        break;
+      case 'rook':
+        newPiece.src = rookDark;
+        break;
     }
   }
 
+  newPiece.setAttribute('draggable', 'true');
+  newPiece.className = 'piece';
+
   document.querySelector(`#${square.id}`).appendChild(newPiece);
-  resizePiece(newPiece);
 }
 
 export function removePossible() {
@@ -55,15 +71,70 @@ export function movePiece(oldSquareId, newSquareId) {
   square.appendChild(piece);
 }
 
-export function removePiece(newSquare) {
+export function removePiece(newSquare, captured) {
   const piece = document.querySelector(`#${newSquare.id} > img`);
   piece.parentElement.removeChild(piece);
+
+  if (captured) {
+    addToCaptured(newSquare.piece.player, newSquare.piece.constructor.name);
+  }
+}
+
+function addToCaptured(player, type) {
+  const container = document.querySelector(`div[data-player="${player}"]`);
+  const image = new Image();
+  if (player === 1) {
+    switch (type) {
+      case 'Pawn':
+        image.src = pawnLight;
+        break;
+      case 'Rook':
+        image.src = rookLight;
+        break;
+      case 'Knight':
+        image.src = knightLight;
+        break;
+      case 'Bishop':
+        image.src = bishopLight;
+        break;
+      case 'Queen':
+        image.src = queenLight;
+        break;
+      case 'King':
+        image.src = kingLight;
+        break;
+    }
+  } else if (player === 2) {
+    switch (type) {
+      case 'Pawn':
+        image.src = pawnDark;
+        break;
+      case 'Rook':
+        image.src = rookDark;
+        break;
+      case 'Knight':
+        image.src = knightDark;
+        break;
+      case 'Bishop':
+        image.src = bishopDark;
+        break;
+      case 'Queen':
+        image.src = queenDark;
+        break;
+      case 'King':
+        image.src = kingDark;
+        break;
+    }
+  }
+  image.setAttribute('draggable', 'false');
+  image.className = 'captured';
+  container.appendChild(image);
 }
 
 export function renderPromotionChoice(pawn, square) {
   const squareElement = document.querySelector(`#${square.id}`);
-  const title = document.querySelector('.container');
-  title.insertAdjacentHTML('beforeend', '<div class="promotion">');
+  const title = document.querySelector('.board');
+  title.insertAdjacentHTML('beforeend', '<div class="promotion"></div>');
   const selectionBox = document.querySelector('.promotion');
 
   const images = [new Image(), new Image(), new Image(), new Image()];
@@ -83,23 +154,21 @@ export function renderPromotionChoice(pawn, square) {
   images.forEach((image, index) => {
     image.setAttribute('draggable', 'false');
     image.setAttribute('data-order', index);
+    image.className = 'promotion-piece';
     selectionBox.appendChild(image);
-    resizePiece(image);
   });
 
   const boxWidth = squareElement.getBoundingClientRect().width;
-  const edgeWidth = document.querySelector('.edge-vertical').getBoundingClientRect().width;
   const squareColumn = squareElement.id.charAt(0);
   let factor = squareColumn.charCodeAt(0) - 64;
   if (factor === 8) factor = 6;
-  selectionBox.style.left = `${edgeWidth + boxWidth * factor}px`;
+  selectionBox.style.left = `${0.8 + 4.9 * factor}vw`;
 
   if (pawn.player === 1) {
-    selectionBox.style.top = `${-squareElement.getBoundingClientRect().height * 8}px`;
+    selectionBox.setAttribute('data-player', '1');
   } else {
-    selectionBox.style.bottom = `${boxWidth * 4 + parseInt(getComputedStyle(selectionBox).getPropertyValue('border-width').replace('px', '')) * 2}px`;
+    selectionBox.setAttribute('data-player', '2');
   }
-  selectionBox.style.width = `${boxWidth}px`;
 
   return images;
 }
@@ -109,33 +178,68 @@ export function removePromotionChoice() {
   box.parentElement.removeChild(box);
 }
 
-export function resizePiece(piece) {
-  const boxWidth = document.querySelector('.square').getBoundingClientRect().width;
-  if (piece) {
-    piece.style.width = `${boxWidth}px`;
-  } else {
-    const pieces = Array.from(document.querySelectorAll('.piece'));
-    pieces.forEach((piece) => {
-      piece.style.width = `${boxWidth}px`;
-    });
-  }
-}
-
 export function renderCheck(king, allSquares) {
   const kingSquare = king.getSquare(allSquares);
   const kingElement = document.querySelector(`#${kingSquare.id}`);
   const kingImage = kingElement.querySelector('img');
-
-  const elementHeight = kingElement.getBoundingClientRect().height;
-  kingElement.style.padding = `0 0 ${elementHeight - 2 * 4}px`;
 
   kingElement.classList.add('check');
   kingImage.classList.add('check');
 }
 
 export function removeCheck() {
-  debugger;
   const checkedElements = document.querySelectorAll('.check');
   Array.from(checkedElements).forEach((el) => el.classList.remove('check'));
-  document.querySelector('div.square[style]').removeAttribute('style');
+}
+
+export function renderWinBox(player) {
+  const markup = `
+    <div class="card">
+      <h2>Game Over</h2>
+      <p>Checkmate: ${player === 1 ? 'White' : 'Black'} Wins</p>
+      <button class="play-again">Play Again?</button>
+    </div>
+  `;
+  document.querySelector('.board').insertAdjacentHTML('beforeend', markup);
+}
+
+export function renderDrawBox(player) {
+  const markup = `
+    <div class="card">
+      <h2>Game Over</h2>
+      <p>Stalemate</p>
+      <button class="play-again">Play Again?</button>
+    </div>
+  `;
+  document.querySelector('.board').insertAdjacentHTML('beforeend', markup);
+}
+
+export function resetPieces() {
+  Array.from(document.querySelectorAll('.piece,.captured')).forEach((image) => {
+    image.parentElement.removeChild(image);
+  });
+  const pieces = [rookDark, knightDark, bishopDark, queenDark, kingDark, bishopDark, knightDark, rookDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, rookLight, knightLight, bishopLight, queenLight, kingLight, bishopLight, knightLight, rookLight];
+  const iterator = pieces[Symbol.iterator]();
+
+  for (let i = 8; i >= 7; i--) {
+    for (let j = 0; j <= 7; j++) {
+      const square = document.querySelector(`#${String.fromCharCode(j + 65)}${i}`);
+      const image = new Image();
+      image.src = iterator.next().value;
+      image.setAttribute('draggable', 'true');
+      image.className = 'piece';
+      square.appendChild(image);
+    }
+  }
+
+  for (let i = 2; i >= 1; i--) {
+    for (let j = 0; j <= 7; j++) {
+      const square = document.querySelector(`#${String.fromCharCode(j + 65)}${i}`);
+      const image = new Image();
+      image.src = iterator.next().value;
+      image.setAttribute('draggable', 'true');
+      image.className = 'piece';
+      square.appendChild(image);
+    }
+  }
 }

@@ -18,8 +18,30 @@ h1 {
 }
 
 .container {
+  display: flex;
+  justify-content: center;
   margin: auto;
-  width: 40%;
+}
+
+.board {
+  margin: 0;
+  width: 40vw;
+}
+
+.edge-container {
+  font-size: 0;
+  width: 5vw;
+  height: 30vw;
+  border: 0.2vw solid black;
+  box-sizing: content-box;
+}
+
+.edge-container[data-player="1"] {
+  margin-right: 1vw;
+}
+
+.edge-container[data-player="2"] {
+  margin-left: 1vw;
 }
 
 .row {
@@ -34,14 +56,31 @@ h1 {
   padding-bottom: 12.25%;
 }
 
+.card {
+  border: 0.1vw solid black;
+  width: 50%;
+  background-color: white;
+  text-align: center;
+  position: relative;
+  top: -32vw;
+  left: 10.4vw;
+  height: 20vw;
+}
+
+.piece,
+.promotion-piece {
+  width: 4.9vw;
+}
+
 .square.check {
-  border: 4px solid rgba(255, 0, 0, 0.7);
+  border: 0.2vw solid rgba(255, 0, 0, 0.7);
+  padding-bottom: 4.5vw;
 }
 
 .piece.check {
   position: relative;
-  top: -4px;
-  left: -4px;
+  top: -0.2vw;
+  left: -0.2vw;
 }
 
 .edge-horizontal {
@@ -51,18 +90,18 @@ h1 {
 
 .edge-vertical {
   display: flex;
-  width: 2%;
+  width: 0.8vw;
   justify-content: center;
   align-items: center;
 }
 
-.container .row:nth-child(2n-1) .square:nth-child(2n),
-.container .row:nth-child(2n) .square:nth-child(2n-1) {
+.board .row:nth-child(2n-1) .square:nth-child(2n),
+.board .row:nth-child(2n) .square:nth-child(2n-1) {
   background-color: #e5d2b2;
 }
 
-.container .row:nth-child(2n-1) .square:nth-child(2n-1),
-.container .row:nth-child(2n) .square:nth-child(2n) {
+.board .row:nth-child(2n-1) .square:nth-child(2n-1),
+.board .row:nth-child(2n) .square:nth-child(2n) {
   background-color: #7f401d;
 }
 
@@ -78,32 +117,46 @@ h1 {
 
 .promotion {
   background-color: #f8f8f8;
-  border: 3px solid #c8c8c8;
+  border: 0.15vw solid #c8c8c8;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
   align-items: center;
+  width: 4.9vw;
 }
 
-img[draggable='false'] {
+.promotion[data-player="1"] {
+  top: -39.2vw;
+}
+
+.promotion[data-player="2"] {
+  bottom: 19.9vw;
+}
+
+.captured {
+  display: inline-block;
+  width: 2.5vw;
+}
+
+.promotion-piece {
   vertical-align: middle;
   cursor: pointer;
 }
 
-img[data-order='0'] {
+.promotion-piece[data-order='0'] {
   animation: fadein 0.3s 0.1s backwards;
 }
 
-img[data-order='1'] {
+.promotion-piece[data-order='1'] {
   animation: fadein 0.3s 0.2s backwards;
 }
 
-img[data-order='2'] {
+.promotion-piece[data-order='2'] {
   animation: fadein 0.3s 0.3s backwards;
 }
 
-img[data-order='3'] {
+.promotion-piece[data-order='3'] {
   animation: fadein 0.3s 0.4s backwards;
 }
 
