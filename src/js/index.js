@@ -86,12 +86,14 @@ function init() {
   });
 
   document.addEventListener('mousedown', preventDrag);
+  document.querySelector('.container').addEventListener('click', playAgain);
+  document.querySelector('.container').addEventListener('click', removeCard);
 
   if (document.querySelector('.card')) {
     const card = document.querySelector('.card');
     card.parentElement.removeChild(card);
-    boardView.resetPieces();
   }
+  boardView.resetPieces();
 
   state.playing = true;
 }
@@ -238,7 +240,6 @@ function checkForCheckmate() {
       if (utils.getAllPossibleMoves(state, 3 - state.player).length === 0) {
         boardView.renderWinBox(state.player);
         state.playing = false;
-        document.querySelector('.play-again').addEventListener('click', init);
       } else {
         const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
         boardView.renderCheck(king, state.squares);
@@ -251,10 +252,8 @@ function checkForCheckmate() {
   if (state.playing) {
     state.player = 3 - state.player;
     if (utils.getAllPossibleMoves(state, state.player).length === 0) {
-      boardView.renderDrawBox(state.player);
+      boardView.renderDrawBox();
       state.playing = false;
-      document.querySelector('.play-again').addEventListener('click', init);
-
     }
   }
 }
@@ -294,7 +293,12 @@ function removePossible() {
   state.currentPiece = null;
 }
 
-init();
+function playAgain(e) {
+  if (e.target.className.startsWith('play-again')) init();
+}
 
-// For testing
-window.state = state;
+function removeCard(e) {
+  if (e.target.className === 'fas fa-times') boardView.hideCard();
+}
+
+init();

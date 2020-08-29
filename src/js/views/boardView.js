@@ -158,11 +158,10 @@ export function renderPromotionChoice(pawn, square) {
     selectionBox.appendChild(image);
   });
 
-  const boxWidth = squareElement.getBoundingClientRect().width;
   const squareColumn = squareElement.id.charAt(0);
   let factor = squareColumn.charCodeAt(0) - 64;
   if (factor === 8) factor = 6;
-  selectionBox.style.left = `${0.8 + 4.9 * factor}vw`;
+  selectionBox.style.left = `${1.68 + 4.83 * factor}vw`;
 
   if (pawn.player === 1) {
     selectionBox.setAttribute('data-player', '1');
@@ -198,12 +197,13 @@ export function renderWinBox(player) {
       <h2>Game Over</h2>
       <p>Checkmate: ${player === 1 ? 'White' : 'Black'} Wins</p>
       <button class="play-again">Play Again?</button>
+      <i class="fas fa-times"></i>
     </div>
   `;
   document.querySelector('.board').insertAdjacentHTML('beforeend', markup);
 }
 
-export function renderDrawBox(player) {
+export function renderDrawBox() {
   const markup = `
     <div class="card">
       <h2>Game Over</h2>
@@ -242,4 +242,12 @@ export function resetPieces() {
       square.appendChild(image);
     }
   }
+
+  document.querySelector('.play-again-side').textContent = 'Reset';
+}
+
+export function hideCard() {
+  const card = document.querySelector('.card');
+  card.parentElement.removeChild(card);
+  document.querySelector('.play-again-side').textContent = 'Play Again?';
 }
