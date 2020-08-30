@@ -24,8 +24,10 @@ body {
 
 h1 {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   padding: 1% 0;
+  font-weight: 100;
+  font-style: italic;
 }
 
 .container {
@@ -76,6 +78,7 @@ h1 {
 }
 
 .edge-container {
+  background-color: white;
   font-size: 0;
   width: 5vw;
   height: 30vw;
@@ -101,6 +104,7 @@ h1 {
   top: 8vw;
   left: 10.4vw;
   height: 20vw;
+  animation: fadein 0.3s, moveup 0.5s;
 }
 
 .card h2 {
@@ -115,7 +119,6 @@ h1 {
 .play-again {
   display: inline-block;
   padding: 0.3em 1.2em;
-  margin: 0 0.1em 0.1em 0;
   border: 0.16em solid rgba(255, 255, 255, 0);
   background-color:#f14e4e;
   border-radius: 2em;
@@ -141,7 +144,6 @@ h1 {
 .play-again-side {
   display: inline-block;
   padding: 0.3em 1.2em;
-  margin: 0 0.1em 0.1em 0;
   border: 0.16em solid rgba(255, 255, 255, 0);
   background-color:#f14e4e;
   border-radius: 2em;
@@ -237,6 +239,28 @@ i.fa-times {
   top: -0.3vw;
 }
 
+.indicator {
+  width: 2vw;
+  height: 2vw;
+  margin-top: 0.5vw;
+  background-color: white;
+  border: 1px solid rgb(53, 28, 8);
+  position: relative;
+  left: 3.4vw;
+}
+
+.indicator[data-player="1"] {
+  background-color: white;
+}
+
+.indicator[data-player="2"] {
+  background-color: black;
+}
+
+.dragged {
+  opacity: 0;
+}
+
 .promotion-piece[data-order='0'] {
   animation: fadein 0.3s 0.1s backwards;
 }
@@ -259,5 +283,24 @@ i.fa-times {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes moveup {
+  0% {
+    transform: translateY(400px);
+    animation-timing-function: ease-out;
+  }
+  60% {
+    transform: translateY(-50px);
+    animation-timing-function: ease-in;
+  }
+  80% {
+    transform: translateY(10px);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: translateY(0);
+    animation-timing-function: ease-in;
   }
 }

@@ -251,3 +251,12 @@ export function hideCard() {
   card.parentElement.removeChild(card);
   document.querySelector('.play-again-side').textContent = 'Play Again?';
 }
+
+export function changePlayer() {
+  const indicator = document.querySelector('.indicator');
+  if (indicator.getAttribute('data-player') === '1') {
+    indicator.setAttribute('data-player', '2');
+  } else {
+    indicator.setAttribute('data-player', '1');
+  }
+}
