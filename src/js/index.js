@@ -94,6 +94,8 @@ function init() {
     card.parentElement.removeChild(card);
   }
   boardView.resetPieces();
+  const indicator = document.querySelector('.indicator');
+  indicator.setAttribute('data-player', '1');
 
   state.playing = true;
 }
@@ -130,6 +132,7 @@ function handleDragStart(e) {
   const square = utils.getSquare(squareElement.id, state.squares);
 
   if (square.piece.player === state.player && state.playing) {
+    squareElement.querySelector('img').classList.add('dragged');
     e.dataTransfer.setData('text', e.target.parentElement.id);
     removePossible();
     let possibleSquares = square.piece.getPossibleMoves(state, state.player);
@@ -154,6 +157,7 @@ function handleDragOver(e) {
 }
 
 function handleDrop(e) {
+  document.querySelectorAll('.dragged').forEach((image) => image.classList.remove('dragged'));
   const squareElement = e.target.closest('.square');
 
   if (squareElement.querySelector('.possible')) {
@@ -251,6 +255,7 @@ function checkForCheckmate() {
 
   if (state.playing) {
     state.player = 3 - state.player;
+    boardView.changePlayer();
     if (utils.getAllPossibleMoves(state, state.player).length === 0) {
       boardView.renderDrawBox();
       state.playing = false;
