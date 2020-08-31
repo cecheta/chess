@@ -132,12 +132,12 @@ function handleDragStart(e) {
   const square = utils.getSquare(squareElement.id, state.squares);
 
   if (square.piece.player === state.player && state.playing) {
-    squareElement.querySelector('img').classList.add('dragged');
     e.dataTransfer.setData('text', e.target.parentElement.id);
     removePossible();
     let possibleSquares = square.piece.getPossibleMoves(state, state.player);
     possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
     if (possibleSquares.length !== 0) {
+      squareElement.querySelector('img').classList.add('dragged');
       boardView.renderPossible(possibleSquares);
       square.piece.movesVisible = true;
       state.currentPiece = square.piece;
@@ -157,7 +157,7 @@ function handleDragOver(e) {
 }
 
 function handleDrop(e) {
-  document.querySelectorAll('.dragged').forEach((image) => image.classList.remove('dragged'));
+  document.querySelector('.dragged').classList.remove('dragged');
   const squareElement = e.target.closest('.square');
 
   if (squareElement.querySelector('.possible')) {
