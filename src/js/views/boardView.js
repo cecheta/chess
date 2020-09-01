@@ -209,6 +209,7 @@ export function renderDrawBox() {
       <h2>Game Over</h2>
       <p>Stalemate</p>
       <button class="play-again">Play Again?</button>
+      <i class="fas fa-times"></i>
     </div>
   `;
   document.querySelector('.board').insertAdjacentHTML('beforeend', markup);
