@@ -197,16 +197,16 @@ function handleTouchMove(e) {
       square.piece.movesVisible = true;
       state.currentPiece = square.piece;
 
-      const coordX = event.touches[0].pageX;
-      const coordY = event.touches[0].pageY;
+      const coordX = event.touches[0].clientX;
+      const coordY = event.touches[0].clientY;
       const draggableItemRect = e.target.getBoundingClientRect();
-      e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px) translateZ(0) scale(1)`;
+      e.target.classList.add('active');
+      e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px)`;
       if (document.elementFromPoint(coordX, coordY)) {
         state.currentSquare = document.elementFromPoint(coordX, coordY).closest('.square');
       } else {
         state.currentSquare = null;
       }
-      e.target.classList.add('active');
       if (e.target.classList.contains('check')) {
         e.target.classList.remove('check');
       }
