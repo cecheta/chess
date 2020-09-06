@@ -16,8 +16,9 @@ function init() {
     pieces: [],
     squares: [],
     currentPiece: null,
+    currentSquare: null,
     player: 1,
-    playing: false,
+    playing: true,
   };
 
   const newPieces = [];
@@ -77,6 +78,8 @@ function init() {
     state.squares.push(new Square(id, piece));
   }
 
+  boardView.resetPieces();
+
   const squares = Array.from(document.querySelectorAll('.square'));
   squares.forEach((square) => {
     square.addEventListener('dragstart', handleDragStart);
@@ -85,6 +88,13 @@ function init() {
     square.addEventListener('click', handleClick);
   });
 
+  const images = Array.from(document.querySelectorAll('.piece'));
+  images.forEach((image) => {
+    image.addEventListener('touchmove', handleTouchMove);
+    image.addEventListener('touchend', handleTouchEnd);
+  });
+
+  document.addEventListener('dragend', handleDragEnd);
   document.addEventListener('mousedown', preventDrag);
   document.querySelector('.container').addEventListener('click', playAgain);
   document.querySelector('.container').addEventListener('click', removeCard);
@@ -93,16 +103,13 @@ function init() {
     const card = document.querySelector('.card');
     card.parentElement.removeChild(card);
   }
-  boardView.resetPieces();
   const indicator = document.querySelector('.indicator');
   indicator.setAttribute('data-player', '1');
-
-  state.playing = true;
 }
 
 function handleClick(e) {
   if (state.playing) {
-    const squareElement = e.target.closest('.square');
+    const squareElement = e.currentTarget;
     const square = utils.getSquare(squareElement.id, state.squares);
 
     if (squareElement.querySelector('.possible')) {
@@ -157,8 +164,7 @@ function handleDragOver(e) {
 }
 
 function handleDrop(e) {
-  document.querySelector('.dragged').classList.remove('dragged');
-  const squareElement = e.target.closest('.square');
+  const squareElement = e.currentTarget;
 
   if (squareElement.querySelector('.possible')) {
     const oldSquare = utils.getSquare(e.dataTransfer.getData('text'), state.squares);
@@ -168,6 +174,64 @@ function handleDrop(e) {
     checkForCheckmate();
     removePossible();
   }
+}
+
+function handleDragEnd() {
+  if (document.querySelector('.dragged')) {
+    document.querySelector('.dragged').classList.remove('dragged');
+  }
+}
+
+function handleTouchMove(e) {
+  const squareElement = e.target.closest('.square');
+  const square = utils.getSquare(squareElement.id, state.squares);
+
+  if (square.piece.player === state.player && state.playing) {
+    removePossible();
+    let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+    if (possibleSquares.length !== 0) {
+      state.currentPiece = square.piece;
+      boardView.renderPossible(possibleSquares);
+      square.piece.movesVisible = true;
+      state.currentPiece = square.piece;
+
+      const coordX = event.touches[0].pageX;
+      const coordY = event.touches[0].pageY;
+      const draggableItemRect = e.target.getBoundingClientRect();
+      e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px) translateZ(0) scale(1)`;
+      if (document.elementFromPoint(coordX, coordY)) {
+        state.currentSquare = document.elementFromPoint(coordX, coordY).closest('.square');
+      } else {
+        state.currentSquare = null;
+      }
+      e.target.classList.add('active');
+      if (e.target.classList.contains('check')) {
+        e.target.classList.remove('check');
+      }
+    }
+  }
+}
+
+function handleTouchEnd(e) {
+  const squareElement = state.currentSquare;
+
+  if (squareElement && squareElement.querySelector('.possible')) {
+    const oldSquare = utils.getSquare(e.composedPath()[1].id, state.squares);
+    const newSquare = utils.getSquare(squareElement.id, state.squares);
+
+    movePiece(oldSquare, newSquare);
+    checkForCheckmate();
+    removePossible();
+  }
+
+  if (e.target.parentElement.classList.contains('check')) {
+    e.target.classList.add('check');
+  }
+  e.target.classList.remove('active');
+  e.target.removeAttribute('style');
+
+  state.currentSquare = null;
 }
 
 function preventDrag(e) {
@@ -307,3 +371,5 @@ function removeCard(e) {
 }
 
 init();
+
+window.state = state;
