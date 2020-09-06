@@ -227,6 +227,7 @@ export function resetPieces() {
       const image = new Image();
       image.src = iterator.next().value;
       image.className = 'piece';
+      image.setAttribute('draggable', 'false');
       square.appendChild(image);
     }
   }
@@ -237,6 +238,7 @@ export function resetPieces() {
       const image = new Image();
       image.src = iterator.next().value;
       image.className = 'piece';
+      image.setAttribute('draggable', 'false');
       square.appendChild(image);
     }
   }
