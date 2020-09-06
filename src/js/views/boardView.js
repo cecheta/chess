@@ -12,7 +12,7 @@ import queenDark from '../../img/pieces/queen_dark.svg';
 import kingDark from '../../img/pieces/king_dark.svg';
 
 export function renderPossible(squaresArr) {
-  const markup = '<div class="possible" draggable="false"></div>';
+  const markup = '<div class="possible"></div>';
   squaresArr.forEach((square) => {
     document.querySelector(`#${square}`).insertAdjacentHTML('beforeend', markup);
   });
@@ -52,7 +52,6 @@ export function renderPiece(piece, square) {
     }
   }
 
-  newPiece.setAttribute('draggable', 'true');
   newPiece.className = 'piece';
 
   document.querySelector(`#${square.id}`).appendChild(newPiece);
@@ -227,7 +226,6 @@ export function resetPieces() {
       const square = document.querySelector(`#${String.fromCharCode(j + 65)}${i}`);
       const image = new Image();
       image.src = iterator.next().value;
-      image.setAttribute('draggable', 'true');
       image.className = 'piece';
       square.appendChild(image);
     }
@@ -238,7 +236,6 @@ export function resetPieces() {
       const square = document.querySelector(`#${String.fromCharCode(j + 65)}${i}`);
       const image = new Image();
       image.src = iterator.next().value;
-      image.setAttribute('draggable', 'true');
       image.className = 'piece';
       square.appendChild(image);
     }
