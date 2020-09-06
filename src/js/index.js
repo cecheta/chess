@@ -89,7 +89,6 @@ function init() {
     square.addEventListener('dragstart', handleDragStart);
     square.addEventListener('drop', handleDrop);
     square.addEventListener('dragover', handleDragOver);
-    square.addEventListener('click', handleClick);
   });
 
   const images = Array.from(document.querySelectorAll('.piece'));
@@ -98,6 +97,7 @@ function init() {
     image.addEventListener('touchend', handleTouchEnd);
   });
 
+  document.addEventListener('click', handleClick);
   document.addEventListener('dragend', handleDragEnd);
   document.addEventListener('mousedown', preventDrag);
   document.addEventListener('contextmenu', handleContextMenu);
@@ -114,26 +114,27 @@ function init() {
 
 function handleClick(e) {
   if (state.playing) {
-    const squareElement = e.currentTarget;
-    const square = utils.getSquare(squareElement.id, state.squares);
+    if (e.target.closest('.square')) {
+      const squareElement = e.target.closest('.square');
+      const square = utils.getSquare(squareElement.id, state.squares);
 
-    if (squareElement.querySelector('.possible')) {
-      const oldSquare = state.currentPiece.getSquare(state.squares);
-      movePiece(oldSquare, square);
-      checkForCheckmate();
-      removePossible();
-    } else if (square.piece && square.piece.player === state.player && !square.piece.movesVisible) {
-      removePossible();
-      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-      if (possibleSquares.length !== 0) {
-        boardView.renderPossible(possibleSquares);
-        square.piece.movesVisible = true;
-        state.currentPiece = square.piece;
+      if (squareElement.querySelector('.possible')) {
+        const oldSquare = state.currentPiece.getSquare(state.squares);
+        movePiece(oldSquare, square);
+        checkForCheckmate();
+      } else if (square.piece && square.piece.player === state.player && !square.piece.movesVisible) {
+        removePossible();
+        let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+        possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+        if (possibleSquares.length !== 0) {
+          boardView.renderPossible(possibleSquares);
+          square.piece.movesVisible = true;
+          state.currentPiece = square.piece;
+        }
+        return;
       }
-    } else {
-      removePossible();
     }
+    removePossible();
   }
 }
 
