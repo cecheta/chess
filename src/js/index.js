@@ -79,6 +79,7 @@ function init() {
   }
 
   boardView.resetPieces();
+  boardView.removePossible();
 
   const squares = Array.from(document.querySelectorAll('.square'));
   squares.forEach((square) => {
