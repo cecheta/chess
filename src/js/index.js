@@ -9,6 +9,8 @@ import Square from './models/Square';
 import * as utils from './utils';
 import * as boardView from './views/boardView';
 
+// TODO: DRAG AND DROP FOR DESKTOP
+
 let state;
 
 function init() {
@@ -97,6 +99,7 @@ function init() {
 
   document.addEventListener('dragend', handleDragEnd);
   document.addEventListener('mousedown', preventDrag);
+  document.addEventListener('contextmenu', handleContextMenu);
   document.querySelector('.container').addEventListener('click', playAgain);
   document.querySelector('.container').addEventListener('click', removeCard);
 
@@ -181,6 +184,12 @@ function handleDragEnd() {
   if (document.querySelector('.dragged')) {
     document.querySelector('.dragged').classList.remove('dragged');
   }
+}
+
+function handleContextMenu(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
 }
 
 function handleTouchMove(e) {
