@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  touch-action: none;
 }
 
 *,
@@ -239,6 +240,10 @@ i.fa-times {
   top: -0.3vw;
 }
 
+.dragged {
+  opacity: 0;
+}
+
 .indicator {
   width: 2vw;
   height: 2vw;
@@ -257,8 +262,13 @@ i.fa-times {
   background-color: black;
 }
 
-.dragged {
-  opacity: 0;
+.active {
+  position: fixed;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .promotion-piece[data-order='0'] {
