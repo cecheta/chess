@@ -10,6 +10,7 @@ import * as utils from './utils';
 import * as boardView from './views/boardView';
 
 // TODO: DRAG AND DROP FOR DESKTOP
+// TODO: CLICK ANYWHERE TO REMOVE POSSIBLE
 
 let state;
 
@@ -121,19 +122,17 @@ function handleClick(e) {
       movePiece(oldSquare, square);
       checkForCheckmate();
       removePossible();
-    } else if (square.piece && square.piece.player === state.player) {
-      if (!square.piece.movesVisible) {
-        removePossible();
-        let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-        possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-        if (possibleSquares.length !== 0) {
-          boardView.renderPossible(possibleSquares);
-          square.piece.movesVisible = true;
-          state.currentPiece = square.piece;
-        }
-      } else {
-        removePossible();
+    } else if (square.piece && square.piece.player === state.player && !square.piece.movesVisible) {
+      removePossible();
+      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+      if (possibleSquares.length !== 0) {
+        boardView.renderPossible(possibleSquares);
+        square.piece.movesVisible = true;
+        state.currentPiece = square.piece;
       }
+    } else {
+      removePossible();
     }
   }
 }
@@ -197,28 +196,30 @@ function handleTouchMove(e) {
   const square = utils.getSquare(squareElement.id, state.squares);
 
   if (square.piece.player === state.player && state.playing) {
-    removePossible();
-    let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-    if (possibleSquares.length !== 0) {
-      state.currentPiece = square.piece;
-      boardView.renderPossible(possibleSquares);
-      square.piece.movesVisible = true;
-      state.currentPiece = square.piece;
+    if (square.piece !== state.currentPiece) {
+      removePossible();
+      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+      if (possibleSquares.length !== 0) {
+        state.currentPiece = square.piece;
+        boardView.renderPossible(possibleSquares);
+        square.piece.movesVisible = true;
+        state.currentPiece = square.piece;
+      }
+    }
 
-      const coordX = event.touches[0].clientX;
-      const coordY = event.touches[0].clientY;
-      const draggableItemRect = e.target.getBoundingClientRect();
-      e.target.classList.add('active');
-      e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px)`;
-      if (document.elementFromPoint(coordX, coordY)) {
-        state.currentSquare = document.elementFromPoint(coordX, coordY).closest('.square');
-      } else {
-        state.currentSquare = null;
-      }
-      if (e.target.classList.contains('check')) {
-        e.target.classList.remove('check');
-      }
+    const coordX = event.touches[0].clientX;
+    const coordY = event.touches[0].clientY;
+    const draggableItemRect = e.target.getBoundingClientRect();
+    e.target.classList.add('active');
+    e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px)`;
+    if (document.elementFromPoint(coordX, coordY)) {
+      state.currentSquare = document.elementFromPoint(coordX, coordY).closest('.square');
+    } else {
+      state.currentSquare = null;
+    }
+    if (e.target.classList.contains('check')) {
+      e.target.classList.remove('check');
     }
   }
 }
