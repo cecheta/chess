@@ -10,7 +10,7 @@ import * as utils from './utils';
 import * as boardView from './views/boardView';
 
 // TODO: DRAG AND DROP FOR DESKTOP
-// TODO: CLICK ANYWHERE TO REMOVE POSSIBLE
+// TODO: DISABLE MULTI-TOUCH
 
 let state;
 
@@ -89,12 +89,8 @@ function init() {
     square.addEventListener('dragstart', handleDragStart);
     square.addEventListener('drop', handleDrop);
     square.addEventListener('dragover', handleDragOver);
-  });
-
-  const images = Array.from(document.querySelectorAll('.piece'));
-  images.forEach((image) => {
-    image.addEventListener('touchmove', handleTouchMove);
-    image.addEventListener('touchend', handleTouchEnd);
+    square.addEventListener('touchmove', handleTouchMove);
+    square.addEventListener('touchend', handleTouchEnd);
   });
 
   document.addEventListener('click', handleClick);
@@ -193,34 +189,36 @@ function handleContextMenu(e) {
 }
 
 function handleTouchMove(e) {
-  const squareElement = e.target.closest('.square');
-  const square = utils.getSquare(squareElement.id, state.squares);
+  if (e.target.tagName.toLowerCase() === 'img') {
+    const squareElement = e.target.closest('.square');
+    const square = utils.getSquare(squareElement.id, state.squares);
 
-  if (square.piece.player === state.player && state.playing) {
-    if (square.piece !== state.currentPiece) {
-      removePossible();
-      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-      if (possibleSquares.length !== 0) {
-        state.currentPiece = square.piece;
-        boardView.renderPossible(possibleSquares);
-        square.piece.movesVisible = true;
-        state.currentPiece = square.piece;
+    if (square.piece.player === state.player && state.playing) {
+      if (square.piece !== state.currentPiece) {
+        removePossible();
+        let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+        possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+        if (possibleSquares.length !== 0) {
+          state.currentPiece = square.piece;
+          boardView.renderPossible(possibleSquares);
+          square.piece.movesVisible = true;
+          state.currentPiece = square.piece;
+        }
       }
-    }
 
-    const coordX = event.touches[0].clientX;
-    const coordY = event.touches[0].clientY;
-    const draggableItemRect = e.target.getBoundingClientRect();
-    e.target.classList.add('active');
-    e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px)`;
-    if (document.elementFromPoint(coordX, coordY)) {
-      state.currentSquare = document.elementFromPoint(coordX, coordY).closest('.square');
-    } else {
-      state.currentSquare = null;
-    }
-    if (e.target.classList.contains('check')) {
-      e.target.classList.remove('check');
+      const coordX = event.touches[0].clientX;
+      const coordY = event.touches[0].clientY;
+      const draggableItemRect = e.target.getBoundingClientRect();
+      e.target.classList.add('active');
+      e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px)`;
+      if (document.elementFromPoint(coordX, coordY)) {
+        state.currentSquare = document.elementFromPoint(coordX, coordY).closest('.square');
+      } else {
+        state.currentSquare = null;
+      }
+      if (e.target.classList.contains('check')) {
+        e.target.classList.remove('check');
+      }
     }
   }
 }
