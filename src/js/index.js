@@ -10,7 +10,6 @@ import * as utils from './utils';
 import * as boardView from './views/boardView';
 
 // TODO: DRAG AND DROP FOR DESKTOP
-// TODO: DISABLE MULTI-TOUCH
 
 let state;
 
@@ -20,6 +19,7 @@ function init() {
     squares: [],
     currentPiece: null,
     currentSquare: null,
+    draggedPiece: null,
     player: 1,
     playing: true,
   };
@@ -91,6 +91,7 @@ function init() {
     square.addEventListener('dragover', handleDragOver);
     square.addEventListener('touchmove', handleTouchMove);
     square.addEventListener('touchend', handleTouchEnd);
+    square.addEventListener('touchcancel', handleCancel);
   });
 
   document.addEventListener('click', handleClick);
@@ -189,9 +190,10 @@ function handleContextMenu(e) {
 }
 
 function handleTouchMove(e) {
-  if (e.target.tagName.toLowerCase() === 'img') {
+  if (e.target.tagName.toLowerCase() === 'img' && (!state.draggedPiece || e.target.parentElement.id === state.draggedPiece.getSquare(state.squares).id)) {
     const squareElement = e.target.closest('.square');
     const square = utils.getSquare(squareElement.id, state.squares);
+    state.draggedPiece = square.piece;
 
     if (square.piece.player === state.player && state.playing) {
       if (square.piece !== state.currentPiece) {
@@ -206,8 +208,8 @@ function handleTouchMove(e) {
         }
       }
 
-      const coordX = event.touches[0].clientX;
-      const coordY = event.touches[0].clientY;
+      const coordX = e.touches[0].clientX;
+      const coordY = e.touches[0].clientY;
       const draggableItemRect = e.target.getBoundingClientRect();
       e.target.classList.add('active');
       e.target.style.transform = `translateX(${coordX - draggableItemRect.width / 2}px) translateY(${coordY - draggableItemRect.height / 2}px)`;
@@ -227,7 +229,7 @@ function handleTouchEnd(e) {
   const squareElement = state.currentSquare;
 
   if (squareElement && squareElement.querySelector('.possible')) {
-    const oldSquare = utils.getSquare(e.composedPath()[1].id, state.squares);
+    const oldSquare = utils.getSquare(e.target.parentElement.id, state.squares);
     const newSquare = utils.getSquare(squareElement.id, state.squares);
 
     movePiece(oldSquare, newSquare);
@@ -242,6 +244,23 @@ function handleTouchEnd(e) {
   e.target.removeAttribute('style');
 
   state.currentSquare = null;
+  if (e.touches.length === 0) {
+    state.draggedPiece = null;
+  }
+}
+
+function handleCancel(e) {
+  removePossible();
+  if (e.target.parentElement.classList.contains('check')) {
+    e.target.classList.add('check');
+  }
+  e.target.classList.remove('active');
+  e.target.removeAttribute('style');
+
+  state.currentSquare = null;
+  if (e.touches.length === 0) {
+    state.draggedPiece = null;
+  }
 }
 
 function preventDrag(e) {
