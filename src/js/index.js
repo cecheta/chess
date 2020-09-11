@@ -19,6 +19,7 @@ function init() {
     currentSquare: null,
     draggedPiece: null,
     dragging: false,
+    clicking: false,
     player: 1,
     playing: true,
   };
@@ -107,7 +108,7 @@ function init() {
 }
 
 function handleClick(e) {
-  if (state.playing) {
+  if (state.playing && state.clicking) {
     if (!e.target.closest('.square')) {
       removePossible();
     } else {
@@ -128,6 +129,10 @@ function handleClick(e) {
 
 function handleMouseDown(e) {
   if (state.playing) {
+    state.clicking = true;
+    setTimeout(() => {
+      state.clicking = false;
+    }, 200);
     const squareElement = e.target.closest('.square');
     const square = utils.getSquare(squareElement.id, state.squares);
     if (square.piece && square.piece.player === state.player) {
