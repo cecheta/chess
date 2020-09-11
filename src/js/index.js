@@ -86,12 +86,12 @@ function init() {
   const squares = Array.from(document.querySelectorAll('.square'));
   squares.forEach((square) => {
     square.addEventListener('mousedown', handleMouseDown);
-    square.addEventListener('mousemove', handleMouseMove);
     square.addEventListener('touchmove', handleTouchMove);
     square.addEventListener('touchend', handleTouchEnd);
     square.addEventListener('touchcancel', handleCancel);
   });
-
+  
+  document.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseUp);
   document.addEventListener('click', handleClick);
   document.addEventListener('contextmenu', handleContextMenu);
@@ -161,7 +161,7 @@ function handleMouseUp(e) {
     const pieceId = state.currentPiece.getSquare(state.squares).id;
     const img = document.querySelector(`#${pieceId} img`);
 
-    if (squareElement.querySelector('.possible')) {
+    if (squareElement && squareElement.querySelector('.possible')) {
       const oldSquare = state.currentPiece.getSquare(state.squares);
       const newSquare = utils.getSquare(squareElement.id, state.squares);
       movePiece(oldSquare, newSquare);
