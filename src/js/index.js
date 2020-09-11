@@ -161,6 +161,9 @@ function handleMouseMove(e) {
     if (state.pieceMoving) {
       img.classList.add('active');
       img.style.transform = `translateX(${e.clientX - draggableItemRect.width / 2}px) translateY(${e.clientY - draggableItemRect.height / 2}px)`;
+      if (img.classList.contains('check')) {
+        img.classList.remove('check');
+      }
     }
   }
 }
