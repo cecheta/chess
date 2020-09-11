@@ -9,8 +9,6 @@ import Square from './models/Square';
 import * as utils from './utils';
 import * as boardView from './views/boardView';
 
-// TODO: DRAG AND DROP FOR DESKTOP
-
 let state;
 
 function init() {
@@ -20,6 +18,7 @@ function init() {
     currentPiece: null,
     currentSquare: null,
     draggedPiece: null,
+    dragging: false,
     player: 1,
     playing: true,
   };
@@ -86,17 +85,15 @@ function init() {
 
   const squares = Array.from(document.querySelectorAll('.square'));
   squares.forEach((square) => {
-    square.addEventListener('dragstart', handleDragStart);
-    square.addEventListener('drop', handleDrop);
-    square.addEventListener('dragover', handleDragOver);
+    square.addEventListener('mousedown', handleMouseDown);
+    square.addEventListener('mousemove', handleMouseMove);
     square.addEventListener('touchmove', handleTouchMove);
     square.addEventListener('touchend', handleTouchEnd);
     square.addEventListener('touchcancel', handleCancel);
   });
 
+  document.addEventListener('mouseup', handleMouseUp);
   document.addEventListener('click', handleClick);
-  document.addEventListener('dragend', handleDragEnd);
-  document.addEventListener('mousedown', preventDrag);
   document.addEventListener('contextmenu', handleContextMenu);
   document.querySelector('.container').addEventListener('click', playAgain);
   document.querySelector('.container').addEventListener('click', removeCard);
@@ -111,82 +108,74 @@ function init() {
 
 function handleClick(e) {
   if (state.playing) {
-    if (e.target.closest('.square')) {
+    if (!e.target.closest('.square')) {
+      removePossible();
+    } else {
       const squareElement = e.target.closest('.square');
-      const square = utils.getSquare(squareElement.id, state.squares);
-
+      const piece = utils.getSquare(squareElement.id, state.squares).piece;
       if (squareElement.querySelector('.possible')) {
         const oldSquare = state.currentPiece.getSquare(state.squares);
-        movePiece(oldSquare, square);
+        const newSquare = utils.getSquare(squareElement.id, state.squares);
+        movePiece(oldSquare, newSquare);
         checkForCheckmate();
-      } else if (square.piece && square.piece.player === state.player && !square.piece.movesVisible) {
         removePossible();
-        let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-        possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-        if (possibleSquares.length !== 0) {
-          boardView.renderPossible(possibleSquares);
-          square.piece.movesVisible = true;
-          state.currentPiece = square.piece;
-        }
-        return;
+      } else if (!piece || piece.player !== state.player) {
+        removePossible();
       }
     }
-    removePossible();
   }
 }
 
-function handleDragStart(e) {
-  const squareElement = e.target.closest('.square');
-  const square = utils.getSquare(squareElement.id, state.squares);
-
-  if (square.piece.player === state.player && state.playing) {
-    e.dataTransfer.setData('text', e.target.parentElement.id);
-    removePossible();
-    let possibleSquares = square.piece.getPossibleMoves(state, state.player);
-    possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
-    if (possibleSquares.length !== 0) {
-      squareElement.querySelector('img').classList.add('dragged');
-      boardView.renderPossible(possibleSquares);
-      square.piece.movesVisible = true;
-      state.currentPiece = square.piece;
-    } else {
-      e.preventDefault();
+function handleMouseDown(e) {
+  if (state.playing) {
+    const squareElement = e.target.closest('.square');
+    const square = utils.getSquare(squareElement.id, state.squares);
+    if (square.piece && square.piece.player === state.player) {
+      removePossible();
+      let possibleSquares = square.piece.getPossibleMoves(state, state.player);
+      possibleSquares = possibleSquares.filter((el) => utils.checkSquare(state, square.piece, el, state.player));
+      if (possibleSquares.length !== 0) {
+        state.currentPiece = square.piece;
+        boardView.renderPossible(possibleSquares);
+        square.piece.movesVisible = true;
+        state.currentPiece = square.piece;
+        state.dragging = true;
+      }
     }
-  } else {
-    e.preventDefault();
   }
 }
 
-function handleDragOver(e) {
-  if (e.preventDefault) {
-    e.preventDefault();
-  }
-  return false;
-}
-
-function handleDrop(e) {
-  const squareElement = e.currentTarget;
-
-  if (squareElement.querySelector('.possible')) {
-    const oldSquare = utils.getSquare(e.dataTransfer.getData('text'), state.squares);
-    const newSquare = utils.getSquare(e.currentTarget.id, state.squares);
-
-    movePiece(oldSquare, newSquare);
-    checkForCheckmate();
-    removePossible();
+function handleMouseMove(e) {
+  if (state.dragging && state.playing && state.currentPiece) {
+    const id = state.currentPiece.getSquare(state.squares).id;
+    const img = document.querySelector(`#${id} img`);
+    const draggableItemRect = img.getBoundingClientRect();
+    img.classList.add('active');
+    img.style.transform = `translateX(${e.clientX - draggableItemRect.width / 2}px) translateY(${e.clientY - draggableItemRect.height / 2}px)`;
   }
 }
 
-function handleDragEnd() {
-  if (document.querySelector('.dragged')) {
-    document.querySelector('.dragged').classList.remove('dragged');
-  }
-}
+function handleMouseUp(e) {
+  if (state.dragging && state.currentPiece) {
+    const squareElement = e.target.closest('.square');
+    const pieceId = state.currentPiece.getSquare(state.squares).id;
+    const img = document.querySelector(`#${pieceId} img`);
 
-function handleContextMenu(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  return false;
+    if (squareElement.querySelector('.possible')) {
+      const oldSquare = state.currentPiece.getSquare(state.squares);
+      const newSquare = utils.getSquare(squareElement.id, state.squares);
+      movePiece(oldSquare, newSquare);
+      checkForCheckmate();
+      removePossible();
+    }
+
+    if (img.parentElement.classList.contains('check')) {
+      img.classList.add('check');
+    }
+    img.classList.remove('active');
+    img.removeAttribute('style');
+  }
+  state.dragging = false;
 }
 
 function handleTouchMove(e) {
@@ -263,10 +252,10 @@ function handleCancel(e) {
   }
 }
 
-function preventDrag(e) {
-  if (e.preventDefault && e.target.tagName.toLowerCase() !== 'img') {
-    e.preventDefault();
-  }
+function handleContextMenu(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
 }
 
 function movePiece(oldSquare, newSquare) {
