@@ -19,6 +19,7 @@ function init() {
     currentSquare: null,
     draggedPiece: null,
     dragging: false,
+    pieceMoving: false,
     cursor: {
       x: null,
       y: null,
@@ -152,8 +153,15 @@ function handleMouseMove(e) {
     const id = state.currentPiece.getSquare(state.squares).id;
     const img = document.querySelector(`#${id} img`);
     const draggableItemRect = img.getBoundingClientRect();
-    img.classList.add('active');
-    img.style.transform = `translateX(${e.clientX - draggableItemRect.width / 2}px) translateY(${e.clientY - draggableItemRect.height / 2}px)`;
+    const xDistance = e.clientX - state.cursor.x;
+    const yDistance = e.clientY - state.cursor.y;
+    if (Math.abs(xDistance) >= draggableItemRect.width / 5 || Math.abs(yDistance) >= draggableItemRect.height / 5) {
+      state.pieceMoving = true;
+    }
+    if (state.pieceMoving) {
+      img.classList.add('active');
+      img.style.transform = `translateX(${e.clientX - draggableItemRect.width / 2}px) translateY(${e.clientY - draggableItemRect.height / 2}px)`;
+    }
   }
 }
 
@@ -178,6 +186,9 @@ function handleMouseUp(e) {
     img.removeAttribute('style');
   }
   state.dragging = false;
+  state.pieceMoving = false;
+  state.cursor.x = null;
+  state.cursor.y = null;
 }
 
 function handleTouchMove(e) {
