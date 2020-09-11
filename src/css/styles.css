@@ -44,10 +44,6 @@ h1 {
   margin: auto;
 }
 
-.container * {
-  touch-action: none;
-}
-
 .board {
   margin: 0;
   width: 42vw;
