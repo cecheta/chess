@@ -162,7 +162,7 @@ export function renderPromotionChoice(pawn, square) {
   const squareColumn = squareElement.id.charAt(0);
   let factor = squareColumn.charCodeAt(0) - 64;
   if (factor === 8) factor = 6;
-  selectionBox.style.left = `${1.68 + 4.83 * factor}vw`;
+  selectionBox.style.left = `${3.4 + 9.775 * factor}vh`;
 
   if (pawn.player === 1) {
     selectionBox.setAttribute('data-player', '1');
