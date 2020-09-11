@@ -49,10 +49,12 @@ export function renderPiece(piece, square) {
       case 'rook':
         newPiece.src = rookDark;
         break;
+
     }
   }
 
   newPiece.className = 'piece';
+  newPiece.setAttribute('draggable', 'false');
 
   document.querySelector(`#${square.id}`).appendChild(newPiece);
 }
