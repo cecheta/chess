@@ -411,5 +411,3 @@ function removeCard(e) {
 }
 
 init();
-
-window.state = state;
