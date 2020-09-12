@@ -51,7 +51,6 @@ button {
 .board {
   width: 85vh;
   height: 85vh;
-  box-sizing: content-box;
   background-color: rgb(53, 28, 8);
   color: white;
 }
@@ -73,8 +72,7 @@ button {
   padding-bottom: 11.5%;
 }
 
-.piece,
-.promotion-piece {
+.piece {
   width: 9.775vh;
 }
 
@@ -92,7 +90,6 @@ button {
 
 .edge-container {
   background-color: white;
-  font-size: 0;
   width: 12vh;
   min-height: 60vh;
   border: 2px solid black;
@@ -101,7 +98,6 @@ button {
   flex-wrap: wrap;
   align-content: flex-start;
   align-items: flex-start;
-
 }
 
 .edge-container {
@@ -245,6 +241,7 @@ i.fa-times {
 .promotion-piece {
   vertical-align: middle;
   cursor: pointer;
+  width: 9.775vh;
   position: relative;
   left: -3px;
   top: -3px;
@@ -258,6 +255,10 @@ i.fa-times {
   margin-top: 2vh;
   margin-right: 2vh;
   transition: background-color 0.2s linear;
+}
+
+.indicator.right {
+  display: none;
 }
 
 .indicator[data-player='1'] {
@@ -318,5 +319,90 @@ i.fa-times {
   100% {
     transform: translateY(0);
     animation-timing-function: ease-in;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .board {
+    width: 90vw;
+    height: 90vw;
+  }
+
+  .piece {
+    width: 10.35vw;
+  }
+
+  .edge-container {
+    width: 90vw;
+    min-height: 6vw;
+    border: 1px solid black;
+    margin: 0;
+  }
+
+  .edge-container[data-player='1'] {
+    margin-bottom: 2vw;
+  }
+
+  .edge-container[data-player='2'] {
+    margin-top: 2vw;
+  }
+
+  .indicator.left {
+    display: none;
+  }
+
+  .indicator.right {
+    display: block;
+    float: left;
+    margin-top: 2vw;
+  }
+
+  .play-again-side {
+    float: right;
+    margin-top: 2vw;
+  }
+
+  .card {
+    bottom: 70vw;
+  }
+
+  .square.check {
+    border: 2px solid rgba(255, 0, 0, 0.7);
+    height: 10.35vw;
+  }
+
+  .piece.check {
+    top: -2px;
+    left: -2px;
+  }
+
+  .captured {
+    width: 6vw;
+  }
+
+  .promotion {
+    border: 2px solid #c8c8c8;
+    width: 10.35vw;
+    height: 41.4vw;
+    box-sizing: border-box;
+  }
+
+  .promotion[data-player='2'] {
+    bottom: 41.4vw;
+  }
+
+  .promotion-piece {
+    width: 10.35vw;
+    left: -2px;
+    top: -2px;
+  }
+
+  .promotion[data-player='1'] {
+    bottom: 82.8vw;
   }
 }

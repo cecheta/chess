@@ -49,7 +49,6 @@ export function renderPiece(piece, square) {
       case 'rook':
         newPiece.src = rookDark;
         break;
-
     }
   }
 
@@ -162,7 +161,11 @@ export function renderPromotionChoice(pawn, square) {
   const squareColumn = squareElement.id.charAt(0);
   let factor = squareColumn.charCodeAt(0) - 64;
   if (factor === 8) factor = 6;
-  selectionBox.style.left = `${3.4 + 9.775 * factor}vh`;
+
+  const edge = document.querySelector('.square').getBoundingClientRect().left - document.querySelector('.board').getBoundingClientRect().left;
+  const squareWidth = document.querySelector('.square').getBoundingClientRect().width;
+
+  selectionBox.style.left = `${edge + squareWidth * factor}px`;
 
   if (pawn.player === 1) {
     selectionBox.setAttribute('data-player', '1');
@@ -175,7 +178,9 @@ export function renderPromotionChoice(pawn, square) {
 
 export function removePromotionChoice() {
   const box = document.querySelector('.promotion');
-  box.parentElement.removeChild(box);
+  if (box) {
+    box.parentElement.removeChild(box);
+  }
 }
 
 export function renderCheck(king, allSquares) {
@@ -255,10 +260,22 @@ export function hideCard() {
 }
 
 export function changePlayer() {
-  const indicator = document.querySelector('.indicator');
-  if (indicator.getAttribute('data-player') === '1') {
-    indicator.setAttribute('data-player', '2');
-  } else {
-    indicator.setAttribute('data-player', '1');
+  const indicators = Array.from(document.querySelectorAll('.indicator'));
+  indicators.forEach((indicator) => {
+    const player = Number(indicator.getAttribute('data-player'));
+    indicator.setAttribute('data-player', `${3 - player}`);
+  });
+}
+
+export function resizePromotionChoice(allSquares) {
+  const container = document.querySelector('.promotion');
+  if (container) {
+    const promotionSquare = allSquares.find((square) =>  square.piece && square.piece.constructor.name === 'Pawn' && (square.id.charAt(1) === '1' || square.id.charAt(1) === '8'));
+    const squareColumn = promotionSquare.id.charAt(0);
+    let factor = squareColumn.charCodeAt(0) - 64;
+    if (factor === 8) factor = 6;
+    const edge = document.querySelector('.square').getBoundingClientRect().left - document.querySelector('.board').getBoundingClientRect().left;
+    const squareWidth = document.querySelector('.square').getBoundingClientRect().width;
+    container.style.left = `${edge + squareWidth * factor}px`;
   }
 }
