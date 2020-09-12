@@ -87,6 +87,7 @@ function init() {
 
   boardView.resetPieces();
   boardView.removePossible();
+  boardView.removePromotionChoice();
 
   const squares = Array.from(document.querySelectorAll('.square'));
   squares.forEach((square) => {
@@ -104,12 +105,14 @@ function init() {
   document.querySelector('.container').addEventListener('click', playAgain);
   document.querySelector('.container').addEventListener('click', removeCard);
 
+  window.addEventListener('resize', () => boardView.resizePromotionChoice(state.squares));
+
   if (document.querySelector('.card')) {
     const card = document.querySelector('.card');
     card.parentElement.removeChild(card);
   }
-  const indicator = document.querySelector('.indicator');
-  indicator.setAttribute('data-player', '1');
+  const indicators = Array.from(document.querySelectorAll('.indicator'));
+  indicators.forEach((indicator) => indicator.setAttribute('data-player', '1'));
 }
 
 function handleClick(e) {
