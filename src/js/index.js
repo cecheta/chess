@@ -105,8 +105,6 @@ function init() {
   document.querySelector('.container').addEventListener('click', playAgain);
   document.querySelector('.container').addEventListener('click', removeCard);
 
-  window.addEventListener('resize', () => boardView.resizePromotionChoice(state.squares));
-
   if (document.querySelector('.card')) {
     const card = document.querySelector('.card');
     card.parentElement.removeChild(card);
@@ -414,3 +412,5 @@ function removeCard(e) {
 }
 
 init();
+window.addEventListener('resize', () => boardView.resizePromotionChoice(state.squares));
+
