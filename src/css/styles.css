@@ -7,7 +7,7 @@
   -o-user-select: none;
   margin: 0;
   padding: 0;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 *,
@@ -53,6 +53,10 @@ button {
   height: 85vh;
   background-color: rgb(53, 28, 8);
   color: white;
+}
+
+.board * {
+  touch-action: none;
 }
 
 .row {
@@ -322,7 +326,7 @@ i.fa-times {
   }
 }
 
-@media only screen and (max-width: 991px) {
+@media only screen and (orientation: portrait) {
   .container {
     flex-direction: column;
     align-items: center;
