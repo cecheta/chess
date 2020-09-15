@@ -1,5 +1,5 @@
 import Piece from './Piece';
-import * as utils from '../utils';
+import * as utils from '../shared/utils';
 
 export default class King extends Piece {
   constructor(square, player) {

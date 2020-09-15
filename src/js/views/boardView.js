@@ -1,15 +1,5 @@
-import pawnLight from '../../img/pieces/pawn_light.svg';
-import rookLight from '../../img/pieces/rook_light.svg';
-import knightLight from '../../img/pieces/knight_light.svg';
-import bishopLight from '../../img/pieces/bishop_light.svg';
-import queenLight from '../../img/pieces/queen_light.svg';
-import kingLight from '../../img/pieces/king_light.svg';
-import pawnDark from '../../img/pieces/pawn_dark.svg';
-import rookDark from '../../img/pieces/rook_dark.svg';
-import knightDark from '../../img/pieces/knight_dark.svg';
-import bishopDark from '../../img/pieces/bishop_dark.svg';
-import queenDark from '../../img/pieces/queen_dark.svg';
-import kingDark from '../../img/pieces/king_dark.svg';
+import * as capturedView from './capturedView';
+import * as images from '../shared/images';
 
 export function renderPossible(squaresArr) {
   const markup = '<div class="possible"></div>';
@@ -18,43 +8,42 @@ export function renderPossible(squaresArr) {
   });
 }
 
-export function renderPiece(piece, square) {
+export function renderPromotedPiece(piece, square) {
   const newPiece = new Image();
   if (square.piece.player === 1) {
     switch (piece) {
       case 'queen':
-        newPiece.src = queenLight;
+        newPiece.src = images.queenLight;
         break;
       case 'bishop':
-        newPiece.src = bishopLight;
+        newPiece.src = images.bishopLight;
         break;
       case 'knight':
-        newPiece.src = knightLight;
+        newPiece.src = images.knightLight;
         break;
       case 'rook':
-        newPiece.src = rookLight;
+        newPiece.src = images.rookLight;
         break;
     }
   } else if (square.piece.player === 2) {
     switch (piece) {
       case 'queen':
-        newPiece.src = queenDark;
+        newPiece.src = images.queenDark;
         break;
       case 'bishop':
-        newPiece.src = bishopDark;
+        newPiece.src = images.bishopDark;
         break;
       case 'knight':
-        newPiece.src = knightDark;
+        newPiece.src = images.knightDark;
         break;
       case 'rook':
-        newPiece.src = rookDark;
+        newPiece.src = images.rookDark;
         break;
     }
   }
 
   newPiece.className = 'piece';
   newPiece.setAttribute('draggable', 'false');
-
   document.querySelector(`#${square.id}`).appendChild(newPiece);
 }
 
@@ -76,110 +65,7 @@ export function removePiece(newSquare, captured) {
   piece.parentElement.removeChild(piece);
 
   if (captured) {
-    addToCaptured(newSquare.piece.player, newSquare.piece.constructor.name);
-  }
-}
-
-function addToCaptured(player, type) {
-  const container = document.querySelector(`div[data-player="${player}"]`);
-  const image = new Image();
-  if (player === 1) {
-    switch (type) {
-      case 'Pawn':
-        image.src = pawnLight;
-        break;
-      case 'Rook':
-        image.src = rookLight;
-        break;
-      case 'Knight':
-        image.src = knightLight;
-        break;
-      case 'Bishop':
-        image.src = bishopLight;
-        break;
-      case 'Queen':
-        image.src = queenLight;
-        break;
-      case 'King':
-        image.src = kingLight;
-        break;
-    }
-  } else if (player === 2) {
-    switch (type) {
-      case 'Pawn':
-        image.src = pawnDark;
-        break;
-      case 'Rook':
-        image.src = rookDark;
-        break;
-      case 'Knight':
-        image.src = knightDark;
-        break;
-      case 'Bishop':
-        image.src = bishopDark;
-        break;
-      case 'Queen':
-        image.src = queenDark;
-        break;
-      case 'King':
-        image.src = kingDark;
-        break;
-    }
-  }
-  image.setAttribute('draggable', 'false');
-  image.className = 'captured';
-  container.appendChild(image);
-}
-
-export function renderPromotionChoice(pawn, square) {
-  const squareElement = document.querySelector(`#${square.id}`);
-  const title = document.querySelector('.board');
-  title.insertAdjacentHTML('beforeend', '<div class="promotion"></div>');
-  const selectionBox = document.querySelector('.promotion');
-
-  const images = [new Image(), new Image(), new Image(), new Image()];
-
-  images[0].src = pawn.player === 1 ? queenLight : queenDark;
-  images[1].src = pawn.player === 1 ? bishopLight : bishopDark;
-  images[2].src = pawn.player === 1 ? knightLight : knightDark;
-  images[3].src = pawn.player === 1 ? rookLight : rookDark;
-
-  const iterator = images[Symbol.iterator]();
-
-  iterator.next().value.setAttribute('data-piece', 'queen');
-  iterator.next().value.setAttribute('data-piece', 'bishop');
-  iterator.next().value.setAttribute('data-piece', 'knight');
-  iterator.next().value.setAttribute('data-piece', 'rook');
-
-  images.forEach((image, index) => {
-    image.setAttribute('draggable', 'false');
-    image.setAttribute('data-order', index);
-    image.className = 'promotion-piece';
-    selectionBox.appendChild(image);
-  });
-
-  const squareColumn = squareElement.id.charAt(0);
-  let factor = squareColumn.charCodeAt(0) - 64;
-  if (factor === 8) factor = 6;
-
-  const edge = document.querySelector('.square').getBoundingClientRect().left - document.querySelector('.board').getBoundingClientRect().left;
-  const squareWidth = document.querySelector('.square').getBoundingClientRect().width;
-
-  selectionBox.style.left = `${edge + squareWidth * factor}px`;
-
-  if (pawn.player === 1) {
-    selectionBox.setAttribute('data-player', '1');
-  } else {
-    selectionBox.setAttribute('data-player', '2');
-  }
-
-  return images;
-}
-
-export function removePromotionChoice() {
-  const box = document.querySelector('.promotion');
-  if (box) {
-    box.parentElement.removeChild(box);
+    capturedView.addToCaptured(newSquare.piece.player, newSquare.piece.constructor.name);
   }
 }
 
@@ -197,35 +83,11 @@ export function removeCheck() {
   Array.from(checkedElements).forEach((el) => el.classList.remove('check'));
 }
 
-export function renderWinBox(player) {
-  const markup = `
-    <div class="card">
-      <h2>Game Over</h2>
-      <p>Checkmate: ${player === 1 ? 'White' : 'Black'} Wins</p>
-      <button class="play-again">Play Again?</button>
-      <i class="fas fa-times"></i>
-    </div>
-  `;
-  document.querySelector('.board').insertAdjacentHTML('beforeend', markup);
-}
-
-export function renderDrawBox() {
-  const markup = `
-    <div class="card">
-      <h2>Game Over</h2>
-      <p>Stalemate</p>
-      <button class="play-again">Play Again?</button>
-      <i class="fas fa-times"></i>
-    </div>
-  `;
-  document.querySelector('.board').insertAdjacentHTML('beforeend', markup);
-}
-
 export function resetPieces() {
   Array.from(document.querySelectorAll('.piece,.captured')).forEach((image) => {
     image.parentElement.removeChild(image);
   });
-  const pieces = [rookDark, knightDark, bishopDark, queenDark, kingDark, bishopDark, knightDark, rookDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnDark, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, pawnLight, rookLight, knightLight, bishopLight, queenLight, kingLight, bishopLight, knightLight, rookLight];
+  const pieces = [images.rookDark, images.knightDark, images.bishopDark, images.queenDark, images.kingDark, images.bishopDark, images.knightDark, images.rookDark, images.pawnDark, images.pawnDark, images.pawnDark, images.pawnDark, images.pawnDark, images.pawnDark, images.pawnDark, images.pawnDark, images.pawnLight, images.pawnLight, images.pawnLight, images.pawnLight, images.pawnLight, images.pawnLight, images.pawnLight, images.pawnLight, images.rookLight, images.knightLight, images.bishopLight, images.queenLight, images.kingLight, images.bishopLight, images.knightLight, images.rookLight];
   const iterator = pieces[Symbol.iterator]();
 
   for (let i = 8; i >= 7; i--) {
@@ -253,29 +115,10 @@ export function resetPieces() {
   document.querySelector('.play-again-side').textContent = 'Reset';
 }
 
-export function hideCard() {
-  const card = document.querySelector('.card');
-  card.parentElement.removeChild(card);
-  document.querySelector('.play-again-side').textContent = 'Play Again?';
-}
-
 export function changePlayer() {
   const indicators = Array.from(document.querySelectorAll('.indicator'));
   indicators.forEach((indicator) => {
     const player = Number(indicator.getAttribute('data-player'));
     indicator.setAttribute('data-player', `${3 - player}`);
   });
-}
-
-export function resizePromotionChoice(allSquares) {
-  const container = document.querySelector('.promotion');
-  if (container) {
-    const promotionSquare = allSquares.find((square) =>  square.piece && square.piece.constructor.name === 'Pawn' && (square.id.charAt(1) === '1' || square.id.charAt(1) === '8'));
-    const squareColumn = promotionSquare.id.charAt(0);
-    let factor = squareColumn.charCodeAt(0) - 64;
-    if (factor === 8) factor = 6;
-    const edge = document.querySelector('.square').getBoundingClientRect().left - document.querySelector('.board').getBoundingClientRect().left;
-    const squareWidth = document.querySelector('.square').getBoundingClientRect().width;
-    container.style.left = `${edge + squareWidth * factor}px`;
-  }
 }
