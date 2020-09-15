@@ -6,8 +6,10 @@ import Bishop from './models/Bishop';
 import Queen from './models/Queen';
 import King from './models/King';
 import Square from './models/Square';
-import * as utils from './utils';
 import * as boardView from './views/boardView';
+import * as promotionView from './views/promotionView';
+import * as cardView from './views/cardView';
+import * as utils from './shared/utils';
 
 let state;
 
@@ -87,7 +89,7 @@ function init() {
 
   boardView.resetPieces();
   boardView.removePossible();
-  boardView.removePromotionChoice();
+  promotionView.removePromotionChoice();
 
   const squares = Array.from(document.querySelectorAll('.square'));
   squares.forEach((square) => {
@@ -333,7 +335,7 @@ function movePiece(oldSquare, newSquare) {
 
     if (newSquare.piece.constructor.name === 'Pawn' && (newSquare.id.charAt(1) === '1' || newSquare.id.charAt(1) === '8')) {
       const pawn = newSquare.piece;
-      const images = boardView.renderPromotionChoice(pawn, newSquare);
+      const images = promotionView.renderPromotionChoice(pawn, newSquare);
       images.forEach((image) => image.addEventListener('click', promotePiece));
       state.playing = false;
     }
@@ -347,7 +349,7 @@ function checkForCheckmate() {
     const piece = utils.getSquare(square, state.squares).piece;
     if (piece && piece.constructor.name === 'King' && piece.player !== state.player) {
       if (utils.getAllPossibleMoves(state, 3 - state.player).length === 0) {
-        boardView.renderWinBox(state.player);
+        cardView.renderWinBox(state.player);
         state.playing = false;
       } else {
         const king = state.pieces.find((piece) => piece.constructor.name === 'King' && piece.player === 3 - state.player);
@@ -362,7 +364,7 @@ function checkForCheckmate() {
     state.player = 3 - state.player;
     boardView.changePlayer();
     if (utils.getAllPossibleMoves(state, state.player).length === 0) {
-      boardView.renderDrawBox();
+      cardView.renderDrawBox();
       state.playing = false;
     }
   }
@@ -389,8 +391,8 @@ function promotePiece(e) {
   state.pieces.splice(pawnIndex, 1);
   state.pieces.push(newPiece);
   boardView.removePiece(newSquare);
-  boardView.renderPiece(promotionChoice, newSquare);
-  boardView.removePromotionChoice();
+  boardView.renderPromotedPiece(promotionChoice, newSquare);
+  promotionView.removePromotionChoice();
   state.playing = true;
   checkForCheckmate();
 }
@@ -408,9 +410,8 @@ function playAgain(e) {
 }
 
 function removeCard(e) {
-  if (e.target.className === 'fas fa-times') boardView.hideCard();
+  if (e.target.className === 'fas fa-times') cardView.hideCard();
 }
 
 init();
-window.addEventListener('resize', () => boardView.resizePromotionChoice(state.squares));
-
+window.addEventListener('resize', () => promotionView.resizePromotionChoice(state.squares));
