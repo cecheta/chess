@@ -14,13 +14,18 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: |
+    echo '##vso[task.setvariable variable=one]firstValue'
+    echo '##vso[task.setvariable variable=two]secondValue'
+  displayName: 'Run a script'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
     echo $(my-variable)
     echo $(my-variable-two)
-    echo $(my-variable-three)
+    echo $(my-variable-three) 
+    echo $one
+    echo $(one)
+    echo $(one$(two))
   displayName: 'Run a multi-line script'
