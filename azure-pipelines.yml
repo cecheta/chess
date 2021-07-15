@@ -7,7 +7,7 @@ trigger:
 - master
 
 variables:
-- name: my-variable
+- name: my_variable
   value: one
 
 pool:
@@ -22,11 +22,11 @@ steps:
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
-    echo $(my-variable)
+    echo $(my_variable)
     echo aaa
-    echo $(my-variable-two)
+    echo $(my_variable_two)
     echo aaa
-    echo $(my-variable-three) 
+    echo $(my_variable_three) 
     echo aaa
     echo $one
     echo aaa
