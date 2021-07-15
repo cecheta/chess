@@ -23,9 +23,15 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
     echo $(my-variable)
+    echo aaa
     echo $(my-variable-two)
+    echo aaa
     echo $(my-variable-three) 
+    echo aaa
     echo $one
+    echo aaa
     echo $(one)
+    echo aaa
     echo $(one$(two))
+    echo aaa
   displayName: 'Run a multi-line script'
