@@ -32,6 +32,7 @@ steps:
     echo aaa
     echo $(one)
     echo aaa
-    echo $(one$(two))
+    echo $ONE
     echo aaa
+    echo $(MY-VARIABLE-2)
   displayName: 'Run a multi-line script'
