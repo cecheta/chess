@@ -17,14 +17,13 @@ steps:
 - script: |
     echo '##vso[task.setvariable variable=one]firstValue'
     echo '##vso[task.setvariable variable=two]secondValue'
-    echo '##vso[task.setvariable variable=name]ONE'
-    echo '##vso[task.setvariable variable=na/me]ONE'
+    echo '##vso[task.setvariable variable=onesecondValue]thirdValue'
   displayName: 'Run a script'
 
 - script: |
-    echo ${$(NAME)}
-    echo $$(NAME)
-    echo ${ONE}
-    echo $(ONE)
-    printenv
+    echo $(one$(two))
+    echo $(two)
+    echo $(one)
+    echo $(onesecondValue)
+
   displayName: 'Run a multi-line script'
