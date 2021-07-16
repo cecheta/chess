@@ -20,19 +20,7 @@ steps:
   displayName: 'Run a script'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-    echo $(my-variable)
-    echo aaa
-    echo $(my-variable-2)
-    echo aaa
-    echo $(my-variable-3) 
-    echo aaa
-    echo $one
-    echo aaa
-    echo $(one)
-    echo aaa
     echo $ONE
-    echo aaa
-    echo $(MY-VARIABLE-2)
+    echo ${ONE}
+    echo $(ONE)
   displayName: 'Run a multi-line script'
