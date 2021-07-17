@@ -1,11 +1,5 @@
 # Starter pipeline
-- task: PythonScript@0
-  inputs:
-    scriptSource: 'inline'
-    script: |
-      from datetime import datetime
-      
-      print(datetime.now())
+
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
@@ -39,3 +33,11 @@ steps:
     echo $ONE
 
   displayName: 'Run a multi-line script'
+  
+- task: PythonScript@0
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      from datetime import datetime
+      
+      print(datetime.now())  
