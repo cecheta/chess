@@ -15,9 +15,9 @@ pool:
 
 steps:
 - script: |
-    echo $MY-VARIABLE
-    echo $MY-VARIABLE-2
-    echo $MY-VARIABLE-3
+    echo ${MY-VARIABLE}
+    echo ${MY-VARIABLE-2}
+    echo ${MY-VARIABLE-3}
     echo '##vso[task.setvariable variable=one]firstValue'
     echo '##vso[task.setvariable variable=two]secondValue'
     echo '##vso[task.setvariable variable=onesecondValue]thirdValue'
