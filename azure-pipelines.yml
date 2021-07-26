@@ -10,6 +10,7 @@ trigger:
 variables:
 - name: my_variable
   value: one
+- group: bee
 
 pool:
   vmImage: ubuntu-latest
