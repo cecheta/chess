@@ -66,7 +66,6 @@ export function removePiece(newSquare, captured) {
 
   if (captured) {
     capturedView.addToCaptured(newSquare.piece.player, newSquare.piece.constructor.name);
-    console.log(newSquare.piece.constructor.name);
   }
 }
 
